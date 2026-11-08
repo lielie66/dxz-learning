@@ -22,9 +22,9 @@
 
 ## 在线使用
 
-GitHub Pages：`https://<你的用户名>.github.io/geo-lab/`
+GitHub Pages：**https://lielie66.github.io/geo-lab/**
 
-（推送到 GitHub 后，在仓库 Settings → Pages 里把 Source 设为 `main` 分支的 `/docs` 目录即可。）
+（如果 Pages 还没生效：在仓库 Settings → Pages 里把 Source 设为 `main` 分支的 `/docs` 目录。）
 
 ## 离线使用
 
