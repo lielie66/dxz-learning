@@ -1,10 +1,13 @@
 import { useEffect, useRef } from "react";
 import { CHINA_GEO, PROVINCE_MAP } from "../data/china";
+import type { GeoLabel, GeoLine } from "../data/geo4";
 import type { GlobeMarker } from "./Globe";
 
 export type ChinaConfig = {
   highlights: string[];
   markers: GlobeMarker[];
+  polylines: GeoLine[];
+  labels: GeoLabel[];
   showLine: boolean;
   showNames: boolean;
   showExtremes: boolean;
@@ -13,6 +16,8 @@ export type ChinaConfig = {
 export const defaultChinaConfig: ChinaConfig = {
   highlights: [],
   markers: [],
+  polylines: [],
+  labels: [],
   showLine: false,
   showNames: true,
   showExtremes: false,
@@ -203,9 +208,23 @@ export default function ChinaMap({ config, onPick, onHover }: Props) {
         }
       }
 
+      // 自定义线（河流、分界线）
+      for (const line of config.polylines) {
+        ctx.beginPath();
+        line.points.forEach(([lon, lat], i) => {
+          const p = project(lon, lat);
+          if (i === 0) ctx.moveTo(p[0], p[1]);
+          else ctx.lineTo(p[0], p[1]);
+        });
+        ctx.strokeStyle = line.color;
+        ctx.lineWidth = line.width ?? 2;
+        ctx.setLineDash(line.dashed ? [6, 4] : []);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+
       // 标记点
-      for (const mk of config.markers) {
-        const p = project(mk.lon, mk.lat);
+      for (const mk of config.markers) {        const p = project(mk.lon, mk.lat);
         const color = mk.kind === "target" ? "#f97316" : "#0891b2";
         ctx.beginPath();
         ctx.arc(p[0], p[1], 6, 0, Math.PI * 2);
@@ -247,6 +266,21 @@ export default function ChinaMap({ config, onPick, onHover }: Props) {
           ctx.fillStyle = "#6b5a3c";
           ctx.fillText(meta.abbr, tx, ty);
         }
+        ctx.textAlign = "start";
+        ctx.textBaseline = "alphabetic";
+      }
+
+      // 自定义标注
+      for (const lb of config.labels) {
+        const p = project(lb.lon, lb.lat);
+        ctx.font = `${lb.weight ?? 500} ${lb.size ?? 11}px 'PingFang SC','Microsoft YaHei',sans-serif`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = "rgba(255,255,255,0.85)";
+        ctx.strokeText(lb.text, p[0], p[1]);
+        ctx.fillStyle = lb.color ?? "#5b4a2f";
+        ctx.fillText(lb.text, p[0], p[1]);
         ctx.textAlign = "start";
         ctx.textBaseline = "alphabetic";
       }

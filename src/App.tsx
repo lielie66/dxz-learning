@@ -2,12 +2,35 @@ import { useEffect, useMemo, useState } from "react";
 import Globe, { defaultGlobeConfig, type GlobeConfig } from "./globe/Globe";
 import FlatMap from "./globe/FlatMap";
 import ChinaMap, { defaultChinaConfig, type ChinaConfig } from "./globe/ChinaMap";
+import TerrainProfile from "./globe/TerrainProfile";
+import ClimateChart from "./globe/ClimateChart";
+import {
+  CHANGJIANG,
+  HUANGHE,
+  LINE400,
+  QINLING_HUAIHE,
+  STEP1,
+  STEP2,
+  MOUNTAIN_LABELS,
+  TERRAIN_LABELS,
+  type GeoLine,
+} from "./data/geo4";
+
+const GEO4_LINES: Record<string, GeoLine> = {
+  changjiang: CHANGJIANG,
+  huanghe: HUANGHE,
+  line400: LINE400,
+  qinling: QINLING_HUAIHE,
+  step1: STEP1,
+  step2: STEP2,
+};
 import { LESSONS } from "./lessons";
 import {
   makeQuestion,
   makeVariant,
   GEO_KINDS,
   CHINA_KINDS,
+  GEO4_KINDS,
   type Question,
   type QuestionKind,
 } from "./lib/quiz";
@@ -33,7 +56,7 @@ import {
 import "./styles.css";
 
 type Tab = "learn" | "practice" | "wrong";
-type ViewMode = "3d" | "flat" | "split" | "china";
+type ViewMode = "3d" | "flat" | "split" | "china" | "terrain" | "climate";
 
 type ClickFeedback = { ok: boolean; reveal: boolean; dist: number; msg: string };
 
@@ -77,6 +100,11 @@ const KIND_LABELS: Record<QuestionKind, string> = {
   territory: "疆域",
   population: "人口",
   ethnic: "民族",
+  terrainStep: "三级阶梯",
+  climateType: "气候类型",
+  climateFeature: "气温降水",
+  river: "河流湖泊",
+  boundary: "地理分界线",
 };
 
 const OPTION_KEYS = ["A", "B", "C", "D"];
@@ -88,7 +116,7 @@ export default function App() {
 
   const [history, setHistory] = useState<Entry[]>([]);
   const [histIdx, setHistIdx] = useState(-1);
-  const [practiceKind, setPracticeKind] = useState<QuestionKind | "geo" | "china">("geo");
+  const [practiceKind, setPracticeKind] = useState<QuestionKind | "geo" | "china" | "geo4">("geo");
 
   const [wrongbook, setWrongbook] = useState<WrongItem[]>(() => loadWrongBook());
   const [picked, setPicked] = useState<LatLon | null>(null);
@@ -189,10 +217,37 @@ export default function App() {
         };
       } else if (quiz.chinaVisual) {
         c = { ...c, ...quiz.chinaVisual };
+      } else if (quiz.geo4Visual) {
+        const v = quiz.geo4Visual;
+        c = {
+          ...c,
+          showNames: false,
+          polylines: (v.polylines ?? [])
+            .map((id) => GEO4_LINES[id])
+            .filter((x): x is GeoLine => !!x),
+          labels:
+            v.labels === "terrain"
+              ? TERRAIN_LABELS
+              : v.labels === "mountains"
+                ? MOUNTAIN_LABELS
+                : [],
+        };
       }
     }
     return c;
   }, [tab, step, quiz, clickFeedback, pickedProvince]);
+
+  const climateCities =
+    tab === "practice"
+      ? quiz?.geo4Visual?.climateCity
+        ? [quiz.geo4Visual.climateCity]
+        : []
+      : step.climate?.cities ?? [];
+
+  const terrainHighlight =
+    tab === "practice"
+      ? quiz?.geo4Visual?.terrain ?? null
+      : step.terrain?.highlight ?? null;
 
   function updateEntry(patch: Partial<Entry>) {
     setHistory((h) => h.map((e, i) => (i === histIdx ? { ...e, ...patch } : e)));
@@ -204,16 +259,29 @@ export default function App() {
     setPicked(null);
   }
 
-  function makeForScope(scope: QuestionKind | "geo" | "china", avoidKind?: QuestionKind): Question {
-    if (scope === "geo" || scope === "china") {
-      const pool = scope === "geo" ? GEO_KINDS : CHINA_KINDS;
+  function makeForScope(
+    scope: QuestionKind | "geo" | "china" | "geo4",
+    avoidKind?: QuestionKind
+  ): Question {
+    if (scope === "geo" || scope === "china" || scope === "geo4") {
+      const pool = scope === "geo" ? GEO_KINDS : scope === "china" ? CHINA_KINDS : GEO4_KINDS;
       const choices = avoidKind && pool.length > 1 ? pool.filter((k) => k !== avoidKind) : pool;
       return makeQuestion(choices[Math.floor(Math.random() * choices.length)]);
     }
     return makeQuestion(scope);
   }
 
-  function startPractice(scope?: QuestionKind | "geo" | "china") {
+  function viewForQuestion(q: Question): ViewMode {
+    if (q.geo4Visual) {
+      if (q.geo4Visual.climateCity) return "climate";
+      if (q.geo4Visual.terrain) return "terrain";
+      return "china";
+    }
+    if (CHINA_KINDS.includes(q.kind)) return "china";
+    return "3d";
+  }
+
+  function startPractice(scope?: QuestionKind | "geo" | "china" | "geo4") {
     const s = scope ?? "geo";
     const q = makeForScope(s);
     setTab("practice");
@@ -221,7 +289,7 @@ export default function App() {
     setHistory([newEntry(q, null)]);
     setHistIdx(0);
     setPicked(null);
-    setViewMode(CHINA_KINDS.includes(q.kind) ? "china" : "3d");
+    setViewMode(viewForQuestion(q));
   }
 
   function startReview(items: WrongItem[]) {
@@ -236,7 +304,7 @@ export default function App() {
     const entries = items.map((it) => newEntry(makeVariant(it.kind), it));
     setHistory(entries);
     setHistIdx(0);
-    setViewMode(CHINA_KINDS.includes(entries[0].q.kind) ? "china" : "3d");
+    setViewMode(viewForQuestion(entries[0].q));
   }
 
   function answer(i: number) {
@@ -336,7 +404,7 @@ export default function App() {
     const q = makeForScope(practiceKind, quiz?.kind);
     setHistory((h) => [...h, newEntry(q, null)]);
     setHistIdx(histIdx + 1);
-    setViewMode(CHINA_KINDS.includes(q.kind) ? "china" : "3d");
+    setViewMode(viewForQuestion(q));
   }
 
   function prevQuestion() {
@@ -407,8 +475,10 @@ export default function App() {
   }
 
   const inChinaPractice = tab === "practice" && !!quiz && CHINA_KINDS.includes(quiz.kind);
-  const chapter =
-    inChinaPractice || ["territory", "admin", "population", "ethnic"].includes(lesson.id)
+  const inGeo4Practice = tab === "practice" && !!quiz && GEO4_KINDS.includes(quiz.kind);
+  const chapter = inGeo4Practice || ["terrain", "climate", "weather", "rivers", "divides"].includes(lesson.id)
+    ? "第 4 章 · 中国的自然环境"
+    : inChinaPractice || ["territory", "admin", "population", "ethnic"].includes(lesson.id)
       ? "第 3 章 · 中国的疆域和人口"
       : "第 2 章第 1 节 · 地球和地球仪";
 
@@ -431,7 +501,24 @@ export default function App() {
       <main className="layout">
         <section className="stage">
           <div className={viewMode === "split" ? "stage-canvas split" : "stage-canvas"}>
-            {viewMode === "china" ? (
+            {viewMode === "terrain" ? (
+              <div className="pane">
+                <TerrainProfile highlight={terrainHighlight} />
+              </div>
+            ) : viewMode === "climate" ? (
+              <div className="pane">
+                <div className={climateCities.length > 2 ? "climate-grid many" : "climate-grid"}>
+                  {climateCities.map((c) => (
+                    <ClimateChart
+                      key={c}
+                      city={c}
+                      compact={climateCities.length > 2}
+                      title={tab === "practice" ? "某地" : undefined}
+                    />
+                  ))}
+                </div>
+              </div>
+            ) : viewMode === "china" ? (
               <div className="pane">
                 <ChinaMap config={chinaConfig} onPick={handleProvincePick} />
               </div>
@@ -451,7 +538,8 @@ export default function App() {
             )}
           </div>
 
-          <div className="view-switch">
+          {viewMode !== "terrain" && viewMode !== "climate" && (
+            <div className="view-switch">
             <button
               className={viewMode === "3d" ? "on" : ""}
               onClick={() => setViewMode("3d")}
@@ -476,9 +564,10 @@ export default function App() {
             >
               中国地图
             </button>
-          </div>
+            </div>
+          )}
 
-          {viewMode !== "china" && (
+          {(viewMode === "3d" || viewMode === "flat" || viewMode === "split") && (
             <div className="stage-legend">
               <span><i className="dot dot-red" />赤道 0°</span>
               <span><i className="dot dot-blue" />本初子午线 0°</span>
@@ -507,15 +596,19 @@ export default function App() {
               ? "点击省份，查看简称与行政中心"
               : viewMode === "flat"
                 ? "点击地图上的任意位置读坐标"
-                : "拖动旋转 · 滚轮缩放 · 点击球面读坐标"}
-            {hover && viewMode !== "china" && (
+                : viewMode === "terrain"
+                  ? "示意图：西高东低，呈三级阶梯"
+                  : viewMode === "climate"
+                    ? "左轴气温（℃），右轴降水（mm）"
+                    : "拖动旋转 · 滚轮缩放 · 点击球面读坐标"}
+            {hover && (viewMode === "3d" || viewMode === "flat" || viewMode === "split") && (
               <span className="hover-coord">
                 {fmtCoord({ lat: Math.round(hover.lat), lon: Math.round(hover.lon) })}
               </span>
             )}
           </div>
 
-          {picked && viewMode !== "china" && (
+          {picked && (viewMode === "3d" || viewMode === "flat" || viewMode === "split") && (
             <div className="pick-card">
               <button className="pick-close" onClick={() => setPicked(null)}>×</button>
               <div className="pick-title">你点的位置</div>
@@ -614,7 +707,11 @@ export default function App() {
                         startPractice(
                           ["territory", "admin", "population", "ethnic"].includes(lesson.id)
                             ? "china"
-                            : "geo"
+                            : ["terrain", "climate", "weather", "rivers", "divides"].includes(
+                                  lesson.id
+                                )
+                              ? "geo4"
+                              : "geo"
                         )
                       }
                     >
@@ -637,6 +734,9 @@ export default function App() {
                     <button className="btn big ghost" onClick={() => startPractice("china")}>
                       随机练 · 中国的疆域和人口
                     </button>
+                    <button className="btn big ghost" onClick={() => startPractice("geo4")}>
+                      随机练 · 中国的自然环境
+                    </button>
 
                     <div className="kind-section">第 2 章 · 地球和地图</div>
                     <div className="kind-grid">
@@ -650,6 +750,15 @@ export default function App() {
                     <div className="kind-section">第 3 章 · 中国的疆域和人口</div>
                     <div className="kind-grid">
                       {CHINA_KINDS.map((k) => (
+                        <button key={k} className="kind-btn" onClick={() => startPractice(k)}>
+                          {KIND_LABELS[k]}
+                        </button>
+                      ))}
+                    </div>
+
+                    <div className="kind-section">第 4 章 · 中国的自然环境</div>
+                    <div className="kind-grid">
+                      {GEO4_KINDS.map((k) => (
                         <button key={k} className="kind-btn" onClick={() => startPractice(k)}>
                           {KIND_LABELS[k]}
                         </button>

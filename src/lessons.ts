@@ -1,14 +1,26 @@
 import type { GlobeConfig } from "./globe/Globe";
 import type { ChinaConfig } from "./globe/ChinaMap";
+import {
+  CHANGJIANG,
+  HUANGHE,
+  LINE400,
+  QINLING_HUAIHE,
+  STEP1,
+  STEP2,
+  MOUNTAIN_LABELS,
+  TERRAIN_LABELS,
+} from "./data/geo4";
 
 export type LessonStep = {
   title: string;
   body: string;
   bullets?: string[];
   tip?: string;
-  view?: "3d" | "flat" | "split" | "china";
+  view?: "3d" | "flat" | "split" | "china" | "terrain" | "climate";
   globe: Partial<GlobeConfig>;
   china?: Partial<ChinaConfig>;
+  terrain?: { highlight?: 1 | 2 | 3 | null };
+  climate?: { cities: string[] };
 };
 
 export type Lesson = {
@@ -410,6 +422,241 @@ export const LESSONS: Lesson[] = [
             "广西壮族自治区",
             "宁夏回族自治区",
           ],
+        },
+      },
+    ],
+  },
+  {
+    id: "terrain",
+    title: "第 11 课 · 地势与地形",
+    subtitle: "西高东低，三级阶梯",
+    steps: [
+      {
+        title: "地势：西高东低，呈三级阶梯",
+        body: "我国地势西高东低，像三级台阶一样逐级下降。\n第一级是青藏高原，平均海拔 4000 米以上；第二级是高原和盆地，1000—2000 米；第三级是平原和丘陵，500 米以下。",
+        bullets: ["第一级：青藏高原，4000 米以上", "第二级：高原、盆地，1000—2000 米", "第三级：平原、丘陵，500 米以下"],
+        tip: "地势说的是“高低起伏”，地形说的是“地表形态”，两个词别混。",
+        view: "terrain",
+        globe: {},
+        terrain: { highlight: null },
+      },
+      {
+        title: "三级阶梯的分界线",
+        body: "第一、二级阶梯的分界线：昆仑山—祁连山—横断山。\n第二、三级阶梯的分界线：大兴安岭—太行山—巫山—雪峰山。",
+        bullets: ["昆仑山—祁连山—横断山", "大兴安岭—太行山—巫山—雪峰山"],
+        tip: "这两串山脉是必背的，考试常以“界线”或“山脉”两种方式考。",
+        view: "china",
+        globe: {},
+        china: {
+          showNames: false,
+          polylines: [STEP1, STEP2],
+          labels: [
+            { lon: 86, lat: 42.5, text: "第一、二级阶梯分界线", size: 11, color: "#c4b5fd" },
+            { lon: 116, lat: 49, text: "第二、三级阶梯分界线", size: 11, color: "#67e8f9" },
+          ],
+        },
+      },
+      {
+        title: "主要地形区",
+        body: "四大高原：青藏高原、内蒙古高原、黄土高原、云贵高原。\n四大盆地：塔里木盆地、准噶尔盆地、柴达木盆地、四川盆地。\n三大平原：东北平原、华北平原、长江中下游平原。",
+        bullets: ["高原：青藏、内蒙古、黄土、云贵", "盆地：塔里木、准噶尔、柴达木、四川", "平原：东北、华北、长江中下游"],
+        tip: "“四大高原、四大盆地、三大平原”是期末高频记忆点。",
+        view: "china",
+        globe: {},
+        china: {
+          showNames: false,
+          labels: [...TERRAIN_LABELS, ...MOUNTAIN_LABELS],
+        },
+      },
+    ],
+  },
+  {
+    id: "climate",
+    title: "第 12 课 · 气温和降水",
+    subtitle: "南北温差、东西降水",
+    steps: [
+      {
+        title: "冬季：南北温差大",
+        body: "冬季我国南北气温差别很大。漠河 1 月平均气温接近 -30℃，海南岛却在 20℃ 左右。\n1 月 0℃ 等温线大致沿秦岭—淮河分布。",
+        bullets: ["冬季南北温差大", "1 月 0℃ 等温线大致沿秦岭—淮河", "越往北，冬季越冷"],
+        tip: "看两张图：哈尔滨 1 月约 -19℃，广州 1 月约 14℃，差了 30 多度。",
+        view: "climate",
+        globe: {},
+        climate: { cities: ["哈尔滨", "广州"] },
+      },
+      {
+        title: "夏季：普遍高温",
+        body: "夏季除青藏高原等地势高的地区外，全国普遍高温。\n哈尔滨 7 月约 23℃，广州 7 月约 29℃，南北差别不大。",
+        bullets: ["夏季普遍高温", "青藏高原夏季气温较低", "南北温差比冬季小得多"],
+        tip: "冬季看南北，夏季看海拔——这是气温题的两条主线。",
+        view: "climate",
+        globe: {},
+        climate: { cities: ["哈尔滨", "北京", "上海", "广州"] },
+      },
+      {
+        title: "降水：从东南向西北递减",
+        body: "我国年降水量从东南沿海向西北内陆递减。\n800 毫米等降水量线大致沿秦岭—淮河；400 毫米等降水量线大致沿大兴安岭—张家口—兰州—拉萨—喜马拉雅山东段。",
+        bullets: ["东南多，西北少", "800 毫米线：秦岭—淮河", "400 毫米线：大兴安岭—兰州—拉萨一线"],
+        tip: "400 毫米线大致是半湿润区和半干旱区的分界，也是农耕区和牧区的过渡带。",
+        view: "china",
+        globe: {},
+        china: {
+          showNames: false,
+          polylines: [LINE400, QINLING_HUAIHE],
+          labels: [
+            { lon: 112, lat: 30.5, text: "800 毫米", size: 11, color: "#dc2626" },
+            { lon: 108, lat: 40.5, text: "400 毫米", size: 11, color: "#0ea5e9" },
+          ],
+        },
+      },
+    ],
+  },
+  {
+    id: "weather",
+    title: "第 13 课 · 天气与气候",
+    subtitle: "短时间与长期的平均",
+    steps: [
+      {
+        title: "天气和气候不是一回事",
+        body: "天气是一个地方短时间里的大气状况，比如“今天晴转多云”“明天有雨”。\n气候是一个地方多年的天气平均状况，比如“西安夏季高温多雨，冬季寒冷干燥”。",
+        bullets: ["天气：短时间、多变", "气候：多年平均、相对稳定"],
+        tip: "“夜来风雨声”是天气，“四季如春”是气候。",
+        view: "climate",
+        globe: {},
+        climate: { cities: ["西安"] },
+      },
+      {
+        title: "我国主要的气候类型",
+        body: "我国有五种主要气候类型：温带季风气候、亚热带季风气候、热带季风气候、温带大陆性气候、高原山地气候。\n看气温曲线和降水柱状图，就能判断气候类型。",
+        bullets: ["温带季风：冬冷夏热，雨热同期", "亚热带季风：冬季温和，夏季高温多雨", "热带季风：全年高温，分旱雨两季", "温带大陆性：冬冷夏热，降水少", "高原山地：气温低，昼夜温差大"],
+        tip: "判断气候类型，先看最冷月气温，再看降水集中在哪个季节。",
+        view: "climate",
+        globe: {},
+        climate: { cities: ["北京", "上海", "海口", "乌鲁木齐", "拉萨"] },
+      },
+      {
+        title: "气候对人类活动的影响",
+        body: "气候影响农业、饮食、服饰、民居和交通。\n秦岭—淮河以南以水田为主，以北以旱地为主；南方屋顶坡度大，北方屋顶坡度小。",
+        bullets: ["南方水田，北方旱地", "南方湿热，北方干冷", "气候影响民居、饮食和交通"],
+        tip: "答“气候影响”类题，从农业、生活、建筑三个角度写，基本不会漏。",
+        view: "china",
+        globe: {},
+        china: {
+          showNames: false,
+          polylines: [QINLING_HUAIHE],
+          labels: [
+            { lon: 108, lat: 34.8, text: "秦岭—淮河", size: 11, color: "#dc2626" },
+          ],
+        },
+      },
+    ],
+  },
+  {
+    id: "rivers",
+    title: "第 14 课 · 河流和湖泊",
+    subtitle: "长江、黄河与内外流区",
+    steps: [
+      {
+        title: "外流区与内流区",
+        body: "最终流入海洋的河流叫外流河，它们的集水区域叫外流区。\n最终没有流入海洋、而是消失在沙漠或注入内陆湖泊的河流叫内流河，所在区域叫内流区。",
+        bullets: ["外流区：东部季风区，面积约占 2/3", "内流区：西北内陆，面积约占 1/3", "分界线大致沿 400 毫米等降水量线"],
+        tip: "外流区面积大、河流多；内流区面积小、河流少。",
+        view: "china",
+        globe: {},
+        china: {
+          showNames: false,
+          polylines: [CHANGJIANG, HUANGHE],
+          labels: [
+            { lon: 104, lat: 27.5, text: "长江", size: 12, color: "#2563eb", weight: 700 },
+            { lon: 106, lat: 38.5, text: "黄河", size: 12, color: "#d97706", weight: 700 },
+          ],
+        },
+      },
+      {
+        title: "长江：我国第一长河",
+        body: "长江发源于唐古拉山，自西向东注入东海，全长约 6300 千米，是我国长度最长、水量最大、流域面积最广的河流。\n主要支流有嘉陵江、汉江、湘江、赣江等。",
+        bullets: ["发源地：唐古拉山", "注入：东海", "全长约 6300 千米", "我国第一长河、水量最大"],
+        tip: "长江被称为“黄金水道”，航运价值高。",
+        view: "china",
+        globe: {},
+        china: {
+          showNames: false,
+          polylines: [CHANGJIANG],
+          markers: [
+            { lon: 106.5, lat: 29.6, label: "重庆", kind: "point" },
+            { lon: 114.3, lat: 30.6, label: "武汉", kind: "point" },
+            { lon: 121.5, lat: 31.4, label: "上海", kind: "point" },
+          ],
+        },
+      },
+      {
+        title: "黄河：含沙量最大的河流",
+        body: "黄河发源于巴颜喀拉山，自西向东注入渤海，全长约 5464 千米。\n黄河中游流经黄土高原，携带大量泥沙，下游泥沙淤积形成“地上河”。",
+        bullets: ["发源地：巴颜喀拉山", "注入：渤海", "全长约 5464 千米", "含沙量最大，下游有“地上河”"],
+        tip: "“地上河”的成因：中游黄土高原水土流失 → 下游泥沙淤积 → 河床抬高。",
+        view: "china",
+        globe: {},
+        china: {
+          showNames: false,
+          polylines: [HUANGHE],
+          markers: [
+            { lon: 103.8, lat: 36.1, label: "兰州", kind: "point" },
+            { lon: 113.6, lat: 34.8, label: "郑州", kind: "point" },
+            { lon: 117.0, lat: 36.7, label: "济南", kind: "point" },
+          ],
+        },
+      },
+    ],
+  },
+  {
+    id: "divides",
+    title: "第 15 课 · 重要地理分界线",
+    subtitle: "秦岭—淮河与阶梯界线",
+    steps: [
+      {
+        title: "秦岭—淮河：一条线，分南北",
+        body: "秦岭—淮河是我国重要的地理分界线：1 月 0℃ 等温线、800 毫米等降水量线都大致经过这里。\n它还是亚热带与暖温带、湿润区与半湿润区、水田与旱地的分界线。",
+        bullets: ["1 月 0℃ 等温线", "800 毫米等降水量线", "亚热带与暖温带分界", "水田与旱地分界", "南方与北方分界"],
+        tip: "秦岭—淮河的意义，是期末必考的大题，按“气温、降水、温度带、干湿区、农业、南北”六条记。",
+        view: "china",
+        globe: {},
+        china: {
+          showNames: false,
+          polylines: [QINLING_HUAIHE],
+          labels: [
+            { lon: 107, lat: 35.2, text: "秦岭", size: 11, color: "#dc2626" },
+            { lon: 117, lat: 31.6, text: "淮河", size: 11, color: "#dc2626" },
+            { lon: 112, lat: 31.5, text: "秦岭—淮河线", size: 12, color: "#dc2626", weight: 700 },
+          ],
+        },
+      },
+      {
+        title: "其他重要分界线",
+        body: "三级阶梯分界线：昆仑山—祁连山—横断山；大兴安岭—太行山—巫山—雪峰山。\n400 毫米等降水量线：大兴安岭—张家口—兰州—拉萨—喜马拉雅山东段。",
+        bullets: ["第一、二级阶梯：昆仑山—祁连山—横断山", "第二、三级阶梯：大兴安岭—太行山—巫山—雪峰山", "400 毫米线：大兴安岭—兰州—拉萨"],
+        tip: "把分界线和山脉、等降水量线一起记，答题时能互相提示。",
+        view: "china",
+        globe: {},
+        china: {
+          showNames: false,
+          polylines: [STEP1, STEP2, LINE400],
+          labels: [
+            { lon: 86, lat: 42.5, text: "第一、二级阶梯", size: 11, color: "#c4b5fd" },
+            { lon: 116, lat: 49, text: "第二、三级阶梯", size: 11, color: "#67e8f9" },
+            { lon: 108, lat: 40.5, text: "400 毫米线", size: 11, color: "#0ea5e9" },
+          ],
+        },
+      },
+      {
+        title: "一张表记住南北差异",
+        body: "秦岭—淮河以北：1 月均温低于 0℃，年降水量少于 800 毫米，以旱地为主，主要粮食作物是小麦。\n秦岭—淮河以南：1 月均温高于 0℃，年降水量多于 800 毫米，以水田为主，主要粮食作物是水稻。",
+        bullets: ["以北：冷、干、旱地、小麦", "以南：暖、湿、水田、水稻"],
+        tip: "“北麦南稻、北旱南水”是最好记的一组对比。",
+        view: "china",
+        globe: {},
+        china: {
+          showNames: false,
+          polylines: [QINLING_HUAIHE],
         },
       },
     ],

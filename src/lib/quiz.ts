@@ -15,6 +15,7 @@ import {
   pick,
 } from "./coords";
 import { PROVINCES } from "../data/china";
+import { CLIMATE_CITIES, CLIMATE_TYPES } from "../data/geo4";
 
 export type QuestionKind =
   | "lineType"
@@ -29,7 +30,12 @@ export type QuestionKind =
   | "provinceCapital"
   | "territory"
   | "population"
-  | "ethnic";
+  | "ethnic"
+  | "terrainStep"
+  | "climateType"
+  | "climateFeature"
+  | "river"
+  | "boundary";
 
 export type ChinaVisual = {
   highlights?: string[];
@@ -37,6 +43,13 @@ export type ChinaVisual = {
   showExtremes?: boolean;
   showNames?: boolean;
   markers?: { lon: number; lat: number; label?: string; kind?: "point" | "target" }[];
+};
+
+export type Geo4Visual = {
+  polylines?: string[];
+  labels?: "terrain" | "mountains" | "none";
+  climateCity?: string;
+  terrain?: 1 | 2 | 3;
 };
 
 export type Visual =
@@ -54,6 +67,7 @@ export type Question = {
   target?: LatLon;
   targetProvince?: string;
   chinaVisual?: ChinaVisual;
+  geo4Visual?: Geo4Visual;
   /** 内部去重用的签名，不显示给学生 */
   sig?: string;
 };
@@ -72,6 +86,11 @@ const TAGS: Record<QuestionKind, string> = {
   territory: "疆域",
   population: "人口",
   ethnic: "民族",
+  terrainStep: "三级阶梯",
+  climateType: "气候类型",
+  climateFeature: "气温与降水",
+  river: "河流湖泊",
+  boundary: "地理分界线",
 };
 
 function shuffleWithAnswer(correct: string, distractors: string[]): { options: string[]; answer: number } {
@@ -679,6 +698,308 @@ export function makeEthnic(): Question {
   };
 }
 
+// ---------- 第 4 章：中国的自然环境 ----------
+
+function pickN<T>(arr: T[], n: number): T[] {
+  const copy = [...arr];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy.slice(0, n);
+}
+
+type Geo4Tpl = Tpl & { visual?: Geo4Visual };
+
+const TERRAIN_TPL: Geo4Tpl[] = [
+  {
+    prompt: "青藏高原位于我国地势的哪一级阶梯？",
+    correct: "第一级",
+    pool: ["第一级", "第二级", "第三级"],
+    explain: "青藏高原平均海拔 4000 米以上，属于第一级阶梯。",
+    visual: { terrain: 1 },
+  },
+  {
+    prompt: "内蒙古高原位于我国地势的哪一级阶梯？",
+    correct: "第二级",
+    pool: ["第一级", "第二级", "第三级"],
+    explain: "内蒙古高原、黄土高原、云贵高原和三大盆地都属于第二级阶梯。",
+    visual: { terrain: 2 },
+  },
+  {
+    prompt: "东北平原位于我国地势的哪一级阶梯？",
+    correct: "第三级",
+    pool: ["第一级", "第二级", "第三级"],
+    explain: "东北平原、华北平原、长江中下游平原和东南丘陵都属于第三级阶梯。",
+    visual: { terrain: 3 },
+  },
+  {
+    prompt: "四川盆地位于我国地势的哪一级阶梯？",
+    correct: "第二级",
+    pool: ["第一级", "第二级", "第三级"],
+    explain: "四川盆地属于第二级阶梯，海拔 1000—2000 米。",
+    visual: { terrain: 2 },
+  },
+  {
+    prompt: "我国地势的总特征是？",
+    correct: "西高东低，呈三级阶梯分布",
+    pool: ["西高东低，呈三级阶梯分布", "东高西低，呈三级阶梯分布", "南高北低，逐级下降", "中间高、四周低"],
+    explain: "我国地势西高东低，像三级台阶一样逐级下降。",
+    visual: { terrain: 1 },
+  },
+  {
+    prompt: "第一、二级阶梯的分界线是？",
+    correct: "昆仑山—祁连山—横断山",
+    pool: ["昆仑山—祁连山—横断山", "大兴安岭—太行山—巫山—雪峰山", "秦岭—淮河", "天山—阴山—燕山"],
+    explain: "第一、二级阶梯以昆仑山—祁连山—横断山为界。",
+    visual: { polylines: ["step1"], labels: "none" },
+  },
+  {
+    prompt: "第二、三级阶梯的分界线是？",
+    correct: "大兴安岭—太行山—巫山—雪峰山",
+    pool: ["大兴安岭—太行山—巫山—雪峰山", "昆仑山—祁连山—横断山", "秦岭—淮河", "长白山—武夷山—台湾山脉"],
+    explain: "第二、三级阶梯以大兴安岭—太行山—巫山—雪峰山为界。",
+    visual: { polylines: ["step2"], labels: "none" },
+  },
+];
+
+export function makeTerrainStep(): Question {
+  const t = TERRAIN_TPL[drawBag("terrain", TERRAIN_TPL.length)];
+  const { options, answer } = shuffleWithAnswer(t.correct, t.pool.filter((x) => x !== t.correct));
+  return {
+    kind: "terrainStep",
+    tag: TAGS.terrainStep,
+    prompt: t.prompt,
+    options,
+    answer,
+    explain: t.explain,
+    geo4Visual: t.visual,
+    sig: `ts:${t.prompt}`,
+  };
+}
+
+export function makeClimateType(): Question {
+  const city = pickN(CLIMATE_CITIES, 1)[0];
+  const correct = city.type;
+  const others = CLIMATE_TYPES.map((t) => t.name).filter((n) => n !== correct);
+  const { options, answer } = shuffleWithAnswer(correct, pickN(others, 3));
+  const info = CLIMATE_TYPES.find((t) => t.name === correct);
+  return {
+    kind: "climateType",
+    tag: TAGS.climateType,
+    prompt: "图中是某地的气温曲线和降水量柱状图，该地属于哪种气候类型？",
+    options,
+    answer,
+    explain: `${city.name}：${info?.feature ?? ""}，属于${correct}。判断时先看最冷月气温，再看降水集中在哪个季节。`,
+    geo4Visual: { climateCity: city.name },
+    sig: `ct:${city.name}`,
+  };
+}
+
+const CLIMATE_FEATURE_TPL: Geo4Tpl[] = [
+  {
+    prompt: "我国冬季气温分布的特点是？",
+    correct: "南北温差大",
+    pool: ["南北温差大", "南北温差小", "全国普遍高温", "东西温差大"],
+    explain: "冬季我国南北气温差别很大，越往北越冷。",
+  },
+  {
+    prompt: "我国夏季气温分布的特点是？",
+    correct: "除青藏高原外，全国普遍高温",
+    pool: ["除青藏高原外，全国普遍高温", "南北温差很大", "全国普遍低温", "东部高温、西部低温"],
+    explain: "夏季除青藏高原等地势高的地区外，全国普遍高温。",
+  },
+  {
+    prompt: "我国 1 月 0℃ 等温线大致经过哪里？",
+    correct: "秦岭—淮河一线",
+    pool: ["秦岭—淮河一线", "大兴安岭—太行山一线", "昆仑山—祁连山一线", "长江一线"],
+    explain: "1 月 0℃ 等温线大致沿秦岭—淮河分布。",
+  },
+  {
+    prompt: "我国年降水量的分布特点是？",
+    correct: "从东南沿海向西北内陆递减",
+    pool: ["从东南沿海向西北内陆递减", "从西北内陆向东南沿海递减", "南北均匀分布", "东部少、西部多"],
+    explain: "受海陆位置和夏季风影响，我国年降水量从东南沿海向西北内陆递减。",
+  },
+  {
+    prompt: "我国 800 毫米等降水量线大致经过哪里？",
+    correct: "秦岭—淮河一线",
+    pool: ["秦岭—淮河一线", "大兴安岭—太行山一线", "昆仑山—祁连山一线", "南岭一线"],
+    explain: "800 毫米等降水量线大致沿秦岭—淮河分布。",
+  },
+  {
+    prompt: "我国 400 毫米等降水量线大致经过？",
+    correct: "大兴安岭—张家口—兰州—拉萨—喜马拉雅山东段",
+    pool: [
+      "大兴安岭—张家口—兰州—拉萨—喜马拉雅山东段",
+      "秦岭—淮河一线",
+      "昆仑山—祁连山—横断山",
+      "长江一线",
+    ],
+    explain: "400 毫米等降水量线大致沿大兴安岭—张家口—兰州—拉萨—喜马拉雅山东段分布。",
+    visual: { polylines: ["line400"], labels: "none" },
+  },
+];
+
+export function makeClimateFeature(): Question {
+  const t = CLIMATE_FEATURE_TPL[drawBag("climfeat", CLIMATE_FEATURE_TPL.length)];
+  const { options, answer } = shuffleWithAnswer(t.correct, t.pool.filter((x) => x !== t.correct));
+  return {
+    kind: "climateFeature",
+    tag: TAGS.climateFeature,
+    prompt: t.prompt,
+    options,
+    answer,
+    explain: t.explain,
+    geo4Visual: t.visual,
+    sig: `cf:${t.prompt}`,
+  };
+}
+
+const RIVER_TPL: Geo4Tpl[] = [
+  {
+    prompt: "我国长度最长、水量最大的河流是？",
+    correct: "长江",
+    pool: ["长江", "黄河", "珠江", "黑龙江"],
+    explain: "长江全长约 6300 千米，是我国第一长河，也是水量最大的河流。",
+    visual: { polylines: ["changjiang"], labels: "none" },
+  },
+  {
+    prompt: "长江发源于哪座山脉？",
+    correct: "唐古拉山",
+    pool: ["唐古拉山", "巴颜喀拉山", "昆仑山", "祁连山"],
+    explain: "长江发源于唐古拉山，自西向东注入东海。",
+    visual: { polylines: ["changjiang"], labels: "none" },
+  },
+  {
+    prompt: "长江注入哪个海？",
+    correct: "东海",
+    pool: ["东海", "渤海", "黄海", "南海"],
+    explain: "长江自西向东注入东海。",
+    visual: { polylines: ["changjiang"], labels: "none" },
+  },
+  {
+    prompt: "黄河发源于哪座山脉？",
+    correct: "巴颜喀拉山",
+    pool: ["巴颜喀拉山", "唐古拉山", "昆仑山", "秦岭"],
+    explain: "黄河发源于巴颜喀拉山，自西向东注入渤海。",
+    visual: { polylines: ["huanghe"], labels: "none" },
+  },
+  {
+    prompt: "黄河注入哪个海？",
+    correct: "渤海",
+    pool: ["渤海", "黄海", "东海", "南海"],
+    explain: "黄河自西向东注入渤海。",
+    visual: { polylines: ["huanghe"], labels: "none" },
+  },
+  {
+    prompt: "我国含沙量最大的河流是？",
+    correct: "黄河",
+    pool: ["黄河", "长江", "珠江", "黑龙江"],
+    explain: "黄河中游流经黄土高原，携带大量泥沙，是我国含沙量最大的河流。",
+    visual: { polylines: ["huanghe"], labels: "none" },
+  },
+  {
+    prompt: "黄河下游形成“地上河”的主要原因是？",
+    correct: "中游流经黄土高原，泥沙在下游淤积",
+    pool: [
+      "中游流经黄土高原，泥沙在下游淤积",
+      "下游降水太多",
+      "下游地势太高",
+      "上游冰雪融水太多",
+    ],
+    explain: "黄河中游流经黄土高原，水土流失严重；下游地势平缓，泥沙淤积，河床抬高，形成“地上河”。",
+    visual: { polylines: ["huanghe"], labels: "none" },
+  },
+  {
+    prompt: "我国最大的淡水湖是？",
+    correct: "鄱阳湖",
+    pool: ["鄱阳湖", "洞庭湖", "太湖", "青海湖"],
+    explain: "鄱阳湖是我国最大的淡水湖，青海湖是我国最大的湖泊（咸水湖）。",
+  },
+  {
+    prompt: "外流区与内流区的分界线大致是？",
+    correct: "400 毫米等降水量线",
+    pool: ["400 毫米等降水量线", "800 毫米等降水量线", "秦岭—淮河一线", "1 月 0℃ 等温线"],
+    explain: "外流区与内流区的分界线大致沿 400 毫米等降水量线。",
+  },
+];
+
+export function makeRiver(): Question {
+  const t = RIVER_TPL[drawBag("river", RIVER_TPL.length)];
+  const { options, answer } = shuffleWithAnswer(t.correct, t.pool.filter((x) => x !== t.correct));
+  return {
+    kind: "river",
+    tag: TAGS.river,
+    prompt: t.prompt,
+    options,
+    answer,
+    explain: t.explain,
+    geo4Visual: t.visual,
+    sig: `rv:${t.prompt}`,
+  };
+}
+
+const BOUNDARY_TPL: Geo4Tpl[] = [
+  {
+    prompt: "秦岭—淮河一线大致与哪条等温线一致？",
+    correct: "1 月 0℃ 等温线",
+    pool: ["1 月 0℃ 等温线", "1 月 10℃ 等温线", "7 月 0℃ 等温线", "7 月 20℃ 等温线"],
+    explain: "秦岭—淮河一线大致与 1 月 0℃ 等温线一致。",
+    visual: { polylines: ["qinling"], labels: "none" },
+  },
+  {
+    prompt: "秦岭—淮河一线大致与哪条等降水量线一致？",
+    correct: "800 毫米等降水量线",
+    pool: ["800 毫米等降水量线", "400 毫米等降水量线", "200 毫米等降水量线", "1600 毫米等降水量线"],
+    explain: "秦岭—淮河一线大致与 800 毫米等降水量线一致。",
+    visual: { polylines: ["qinling"], labels: "none" },
+  },
+  {
+    prompt: "秦岭—淮河以南的耕地类型主要是？",
+    correct: "水田",
+    pool: ["水田", "旱地", "牧场", "林地"],
+    explain: "秦岭—淮河以南降水多，以水田为主；以北以旱地为主。",
+    visual: { polylines: ["qinling"], labels: "none" },
+  },
+  {
+    prompt: "秦岭—淮河以北的主要粮食作物是？",
+    correct: "小麦",
+    pool: ["小麦", "水稻", "玉米", "青稞"],
+    explain: "秦岭—淮河以北以旱地为主，主要粮食作物是小麦；以南以水田为主，主要粮食作物是水稻。",
+    visual: { polylines: ["qinling"], labels: "none" },
+  },
+  {
+    prompt: "秦岭—淮河是哪两个温度带的分界线？",
+    correct: "亚热带与暖温带",
+    pool: ["亚热带与暖温带", "热带与亚热带", "中温带与暖温带", "高原气候区与亚热带"],
+    explain: "秦岭—淮河是亚热带与暖温带的分界线。",
+    visual: { polylines: ["qinling"], labels: "none" },
+  },
+  {
+    prompt: "秦岭—淮河是哪两个干湿区的分界线？",
+    correct: "湿润区与半湿润区",
+    pool: ["湿润区与半湿润区", "半湿润区与半干旱区", "半干旱区与干旱区", "湿润区与干旱区"],
+    explain: "秦岭—淮河是湿润区与半湿润区的分界线，大致与 800 毫米等降水量线一致。",
+    visual: { polylines: ["qinling"], labels: "none" },
+  },
+];
+
+export function makeBoundary(): Question {
+  const t = BOUNDARY_TPL[drawBag("boundary", BOUNDARY_TPL.length)];
+  const { options, answer } = shuffleWithAnswer(t.correct, t.pool.filter((x) => x !== t.correct));
+  return {
+    kind: "boundary",
+    tag: TAGS.boundary,
+    prompt: t.prompt,
+    options,
+    answer,
+    explain: t.explain,
+    geo4Visual: t.visual,
+    sig: `bd:${t.prompt}`,
+  };
+}
+
 const MAKERS: Record<QuestionKind, () => Question> = {
   lineType: makeLineType,
   readCoord: makeReadCoord,
@@ -693,6 +1014,11 @@ const MAKERS: Record<QuestionKind, () => Question> = {
   territory: makeTerritory,
   population: makePopulation,
   ethnic: makeEthnic,
+  terrainStep: makeTerrainStep,
+  climateType: makeClimateType,
+  climateFeature: makeClimateFeature,
+  river: makeRiver,
+  boundary: makeBoundary,
 };
 
 export const GEO_KINDS: QuestionKind[] = [
@@ -703,6 +1029,14 @@ export const GEO_KINDS: QuestionKind[] = [
   "symmetry",
   "direction",
   "clickCoord",
+];
+
+export const GEO4_KINDS: QuestionKind[] = [
+  "terrainStep",
+  "climateType",
+  "climateFeature",
+  "river",
+  "boundary",
 ];
 
 export const CHINA_KINDS: QuestionKind[] = [
