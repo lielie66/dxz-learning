@@ -13,15 +13,15 @@ export default function MapBasics({ mode }: Props) {
 
           <g>
             <rect x="80" y="90" width="320" height="150" rx="10" fill="#f2ecdc" stroke="#c9bb9c" />
-            <text x="240" y="130" textAnchor="middle" className="mb-strong" fill="#7c2d12">世界地图</text>
-            <text x="240" y="162" textAnchor="middle" className="mb-sub" fill="#8a6a3a">比例尺小</text>
-            <text x="240" y="190" textAnchor="middle" className="mb-sub" fill="#8a6a3a">范围大 · 内容简略</text>
+            <text x="240" y="130" textAnchor="middle" className="mb-strong" style={{ fill: "#7c2d12" }}>世界地图</text>
+            <text x="240" y="162" textAnchor="middle" className="mb-sub" style={{ fill: "#8a6a3a" }}>比例尺小</text>
+            <text x="240" y="190" textAnchor="middle" className="mb-sub" style={{ fill: "#8a6a3a" }}>范围大 · 内容简略</text>
           </g>
           <g>
             <rect x="500" y="90" width="320" height="150" rx="10" fill="#f2ecdc" stroke="#c9bb9c" />
-            <text x="660" y="130" textAnchor="middle" className="mb-strong" fill="#7c2d12">中国地图</text>
-            <text x="660" y="162" textAnchor="middle" className="mb-sub" fill="#8a6a3a">比例尺大</text>
-            <text x="660" y="190" textAnchor="middle" className="mb-sub" fill="#8a6a3a">范围小 · 内容详细</text>
+            <text x="660" y="130" textAnchor="middle" className="mb-strong" style={{ fill: "#7c2d12" }}>中国地图</text>
+            <text x="660" y="162" textAnchor="middle" className="mb-sub" style={{ fill: "#8a6a3a" }}>比例尺大</text>
+            <text x="660" y="190" textAnchor="middle" className="mb-sub" style={{ fill: "#8a6a3a" }}>范围小 · 内容详细</text>
           </g>
           <text x="450" y="270" textAnchor="middle" className="mb-note">
             图幅相同：比例尺越小 → 表示范围越大 → 内容越简略
@@ -73,15 +73,15 @@ export default function MapBasics({ mode }: Props) {
             <text x="0" y="0" className="mb-strong">没有指向标：上北下南，左西右东</text>
             <rect x="0" y="30" width="300" height="180" rx="8" fill="#f8fafc" stroke="#cbd5e1" />
             <text x="150" y="22" textAnchor="middle" className="mb-sub">北</text>
-            <text x="150" y="230" textAnchor="middle" className="mb-sub" fill="#1e293b">南</text>
+            <text x="150" y="230" textAnchor="middle" className="mb-sub" style={{ fill: "#1e293b" }}>南</text>
             <text x="-8" y="126" textAnchor="end" className="mb-sub">西</text>
             <text x="308" y="126" className="mb-sub">东</text>
             <circle cx="90" cy="90" r="6" fill="#2563eb" />
-            <text x="102" y="94" className="mb-sub" fill="#1e293b">A</text>
+            <text x="102" y="94" className="mb-sub" style={{ fill: "#1e293b" }}>A</text>
             <circle cx="220" cy="150" r="6" fill="#2563eb" />
-            <text x="232" y="154" className="mb-sub" fill="#1e293b">B</text>
+            <text x="232" y="154" className="mb-sub" style={{ fill: "#1e293b" }}>B</text>
             <line x1="90" y1="90" x2="220" y2="150" stroke="#94a3b8" strokeDasharray="4 4" />
-            <text x="150" y="106" className="mb-note" fill="#92400e">A 在 B 的西北方向</text>
+            <text x="150" y="106" className="mb-note" style={{ fill: "#92400e" }}>A 在 B 的西北方向</text>
           </g>
 
           <g transform="translate(470,350)">

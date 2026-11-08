@@ -1204,6 +1204,31 @@ button {
   font-size: 12px;
 }
 
+/* ---------- 3D 地形块 ---------- */
+.terrain3d-canvas {
+  position: absolute;
+  inset: 0;
+}
+
+.t3d-label {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 8px;
+  color: #fff;
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+}
+
+.t3d-label.ridge {
+  background: rgba(180, 83, 9, 0.92);
+}
+
+.t3d-label.valley {
+  background: rgba(37, 99, 235, 0.92);
+}
+
 /* ---------- 宇宙与太空 ---------- */
 .solar-wrap,
 .hierarchy-wrap,

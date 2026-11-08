@@ -28,7 +28,8 @@ export type LessonStep = {
     | "contour"
     | "solar"
     | "hierarchy"
-    | "timeline";
+    | "timeline"
+    | "terrain3d";
   globe: Partial<GlobeConfig>;
   china?: Partial<ChinaConfig>;
   terrain?: { highlight?: 1 | 2 | 3 | null };
@@ -759,6 +760,14 @@ const LESSON_LIST: Lesson[] = [
         view: "contour",
         globe: {},
         contour: { highlight: null },
+      },
+      {
+        title: "转一转：山脊和山谷",
+        body: "拖动这个立体地形块，从侧面看：山脊是隆起的，山谷是凹下去的。\n等高线凸向低处的是山脊，凸向高处的是山谷。",
+        bullets: ["山脊：中间高、两边低，像脊背", "山谷：中间低、两边高，常有河流"],
+        tip: "把地形块转到侧面，看山脊的“脊”和山谷的“沟”。蓝色的是山谷里的河流。",
+        view: "terrain3d",
+        globe: {},
       },
       {
         title: "五个部位：山顶、鞍部、陡崖、山脊、山谷",
