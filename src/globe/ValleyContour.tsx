@@ -77,6 +77,19 @@ export default function ValleyContour() {
         {/* 当前水位的等高线 */}
         {chevron(hitX, "#dc2626", 3)}
         <circle cx={hitX} cy={220} r="5" fill="#dc2626" />
+        <text
+          x={hitX + (dir === 1 ? 14 : -14)}
+          y="254"
+          textAnchor={dir === 1 ? "start" : "end"}
+          className="valley-red"
+        >
+          V 尖 → {mode === "valley" ? "高处" : "低处"}
+        </text>
+        <text x="90" y="300" className="valley-small">
+          {mode === "valley"
+            ? "两条支线在交叉点的下游张开，V 尖朝上游"
+            : "两条支线在交叉点的上游张开，V 尖朝下游"}
+        </text>
 
         {/* 剖面 */}
         <rect x="60" y="350" width="780" height="210" rx="14" fill="#f5efe0" stroke="#d6c9ab" />
