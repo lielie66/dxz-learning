@@ -39,7 +39,9 @@ export type QuestionKind =
   | "earth"
   | "map"
   | "contour"
-  | "adminExtreme";
+  | "adminExtreme"
+  | "universe"
+  | "space";
 
 export type ChinaVisual = {
   highlights?: string[];
@@ -99,6 +101,8 @@ const TAGS: Record<QuestionKind, string> = {
   map: "地图三要素",
   contour: "等高线",
   adminExtreme: "行政区划之最",
+  universe: "宇宙与太阳系",
+  space: "太空探索",
 };
 
 function shuffleWithAnswer(correct: string, distractors: string[]): { options: string[]; answer: number } {
@@ -1412,6 +1416,188 @@ export function makeAdminExtreme(): Question {
   };
 }
 
+// ---------- 第 1 章：地球的宇宙环境 ----------
+
+const UNIVERSE_TPL: Geo4Tpl[] = [
+  {
+    prompt: "天体系统由大到小的层级是？",
+    correct: "可观测宇宙 → 银河系 → 太阳系 → 地月系",
+    pool: [
+      "可观测宇宙 → 银河系 → 太阳系 → 地月系",
+      "银河系 → 可观测宇宙 → 太阳系 → 地月系",
+      "太阳系 → 银河系 → 可观测宇宙 → 地月系",
+      "地月系 → 太阳系 → 银河系 → 可观测宇宙",
+    ],
+    explain: "天体系统由大到小：可观测宇宙 → 银河系 → 太阳系 → 地月系。",
+  },
+  {
+    prompt: "地球在宇宙中属于？",
+    correct: "太阳系中的一颗行星",
+    pool: ["太阳系中的一颗行星", "太阳系中的一颗恒星", "地月系的中心天体", "银河系的中心"],
+    explain: "地球是太阳系中的一颗行星，太阳是太阳系的中心天体。",
+  },
+  {
+    prompt: "月球是地球的？",
+    correct: "天然卫星",
+    pool: ["天然卫星", "行星", "恒星", "彗星"],
+    explain: "月球是地球唯一的天然卫星。",
+  },
+  {
+    prompt: "太阳系的中心天体是？",
+    correct: "太阳",
+    pool: ["太阳", "地球", "木星", "月球"],
+    explain: "太阳是太阳系的中心天体，八大行星都围绕太阳公转。",
+  },
+  {
+    prompt: "太阳系八大行星自近及远的顺序是？",
+    correct: "水星、金星、地球、火星、木星、土星、天王星、海王星",
+    pool: [
+      "水星、金星、地球、火星、木星、土星、天王星、海王星",
+      "水星、地球、金星、火星、木星、土星、海王星、天王星",
+      "金星、水星、地球、火星、土星、木星、天王星、海王星",
+      "水星、金星、火星、地球、木星、土星、天王星、海王星",
+    ],
+    explain: "口诀：水金地火木土天海。",
+  },
+  {
+    prompt: "下列属于类地行星的是？",
+    correct: "水星、金星、地球、火星",
+    pool: ["水星、金星、地球、火星", "木星、土星", "天王星、海王星", "太阳、月球"],
+    explain: "类地行星包括水星、金星、地球、火星；巨行星是木星和土星。",
+  },
+  {
+    prompt: "下列属于巨行星的是？",
+    correct: "木星、土星",
+    pool: ["木星、土星", "水星、金星", "地球、火星", "天王星、海王星"],
+    explain: "木星和土星是巨行星，体积和质量大。",
+  },
+  {
+    prompt: "小行星带位于哪两颗行星之间？",
+    correct: "火星和木星之间",
+    pool: ["火星和木星之间", "地球和火星之间", "木星和土星之间", "金星和地球之间"],
+    explain: "小行星带位于火星和木星之间。",
+  },
+  {
+    prompt: "地球存在生命的自身条件是？",
+    correct: "适宜的温度、液态水、适合呼吸的大气",
+    pool: [
+      "适宜的温度、液态水、适合呼吸的大气",
+      "稳定的太阳光照、安全的宇宙环境",
+      "体积最大、质量最大",
+      "距离太阳最近",
+    ],
+    explain: "自身条件：适宜的温度、液态水、适合生物呼吸的大气；外部条件：稳定的太阳光照和安全的宇宙环境。",
+  },
+  {
+    prompt: "地球存在生命的外部条件是？",
+    correct: "稳定的太阳光照、安全的宇宙环境",
+    pool: [
+      "稳定的太阳光照、安全的宇宙环境",
+      "适宜的温度、液态水",
+      "适合呼吸的大气",
+      "地球体积最大",
+    ],
+    explain: "外部条件：太阳光照稳定，宇宙环境安全。",
+  },
+  {
+    prompt: "距离太阳最近的行星是？",
+    correct: "水星",
+    pool: ["水星", "金星", "地球", "火星"],
+    explain: "水星是距离太阳最近的行星。",
+  },
+  {
+    prompt: "太阳系中体积最大的行星是？",
+    correct: "木星",
+    pool: ["木星", "土星", "地球", "海王星"],
+    explain: "木星是太阳系中体积和质量最大的行星。",
+  },
+];
+
+export function makeUniverse(): Question {
+  const t = UNIVERSE_TPL[drawBag("universe", UNIVERSE_TPL.length)];
+  const { options, answer } = shuffleWithAnswer(t.correct, t.pool.filter((x) => x !== t.correct));
+  return {
+    kind: "universe",
+    tag: TAGS.universe,
+    prompt: t.prompt,
+    options,
+    answer,
+    explain: t.explain,
+    sig: `un:${t.prompt}`,
+  };
+}
+
+const SPACE_TPL: Geo4Tpl[] = [
+  {
+    prompt: "世界第一颗人造地球卫星是哪个国家发射的？",
+    correct: "苏联",
+    pool: ["苏联", "美国", "中国", "俄罗斯"],
+    explain: "1957 年，苏联发射了世界第一颗人造地球卫星。",
+  },
+  {
+    prompt: "世界上第一位进入太空的航天员是？",
+    correct: "加加林",
+    pool: ["加加林", "杨利伟", "阿姆斯特朗", "格伦"],
+    explain: "1961 年，苏联航天员加加林乘“东方 1 号”首次进入太空。",
+  },
+  {
+    prompt: "人类首次载人登月是由哪次任务完成的？",
+    correct: "阿波罗 11 号",
+    pool: ["阿波罗 11 号", "东方 1 号", "神舟五号", "联盟号"],
+    explain: "1969 年，美国“阿波罗 11 号”首次载人登月。",
+  },
+  {
+    prompt: "中国第一颗人造地球卫星是？",
+    correct: "东方红一号",
+    pool: ["东方红一号", "神舟五号", "嫦娥一号", "天问一号"],
+    explain: "1970 年，中国成功发射第一颗人造地球卫星“东方红一号”。",
+  },
+  {
+    prompt: "中国首次载人航天任务是？",
+    correct: "神舟五号",
+    pool: ["神舟五号", "东方红一号", "嫦娥一号", "天宫一号"],
+    explain: "2003 年，“神舟五号”将杨利伟送入太空，中国成为第三个独立掌握载人航天技术的国家。",
+  },
+  {
+    prompt: "中国首次月球探测任务是？",
+    correct: "嫦娥一号",
+    pool: ["嫦娥一号", "天问一号", "神舟五号", "东方红一号"],
+    explain: "2007 年，“嫦娥一号”发射成功，中国开始月球探测。",
+  },
+  {
+    prompt: "中国的火星探测任务是？",
+    correct: "天问一号",
+    pool: ["天问一号", "嫦娥五号", "神舟十二号", "天宫一号"],
+    explain: "2020 年“天问一号”发射，2021 年成功着陆火星。",
+  },
+  {
+    prompt: "中国空间站的核心舱是？",
+    correct: "天和",
+    pool: ["天和", "天宫", "天舟", "神舟"],
+    explain: "2021 年“天和”核心舱发射，2022 年中国空间站全面建成。",
+  },
+  {
+    prompt: "太空探索的意义不包括？",
+    correct: "停止地球上的科学研究",
+    pool: ["停止地球上的科学研究", "认识宇宙", "开发太空资源", "推动科技进步"],
+    explain: "太空探索帮助我们认识宇宙、开发资源、推动科技进步，不会停止地球上的科学研究。",
+  },
+];
+
+export function makeSpace(): Question {
+  const t = SPACE_TPL[drawBag("space", SPACE_TPL.length)];
+  const { options, answer } = shuffleWithAnswer(t.correct, t.pool.filter((x) => x !== t.correct));
+  return {
+    kind: "space",
+    tag: TAGS.space,
+    prompt: t.prompt,
+    options,
+    answer,
+    explain: t.explain,
+    sig: `sp:${t.prompt}`,
+  };
+}
+
 const MAKERS: Record<QuestionKind, () => Question> = {
   lineType: makeLineType,
   readCoord: makeReadCoord,
@@ -1435,6 +1621,8 @@ const MAKERS: Record<QuestionKind, () => Question> = {
   map: makeMap,
   contour: makeContour,
   adminExtreme: makeAdminExtreme,
+  universe: makeUniverse,
+  space: makeSpace,
 };
 
 export const GEO_KINDS: QuestionKind[] = [
@@ -1457,6 +1645,8 @@ export const GEO4_KINDS: QuestionKind[] = [
   "river",
   "boundary",
 ];
+
+export const UNIVERSE_KINDS: QuestionKind[] = ["universe", "space"];
 
 export const CHINA_KINDS: QuestionKind[] = [
   "clickProvince",

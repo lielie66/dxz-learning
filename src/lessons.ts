@@ -25,7 +25,10 @@ export type LessonStep = {
     | "climate"
     | "earth"
     | "map"
-    | "contour";
+    | "contour"
+    | "solar"
+    | "hierarchy"
+    | "timeline";
   globe: Partial<GlobeConfig>;
   china?: Partial<ChinaConfig>;
   terrain?: { highlight?: 1 | 2 | 3 | null };
@@ -33,6 +36,8 @@ export type LessonStep = {
   earth?: { mode: "shape" | "zones" };
   map?: { mode: "scale" | "direction" | "legend" };
   contour?: { highlight?: "peak" | "saddle" | "cliff" | "ridge" | "valley" | null };
+  solar?: { highlight?: string | null };
+  timeline?: { mode: "world" | "china" | "all" };
 };
 
 export type Lesson = {
@@ -772,6 +777,73 @@ export const LESSONS: Lesson[] = [
         view: "contour",
         globe: {},
         contour: { highlight: "valley" },
+      },
+    ],
+  },
+  {
+    id: "universe",
+    title: "第 19 课 · 地球在宇宙中",
+    subtitle: "天体系统与太阳系",
+    steps: [
+      {
+        title: "天体系统：一层套一层",
+        body: "宇宙中的天体相互吸引、相互绕转，形成天体系统。\n从大到小：可观测宇宙 → 银河系 → 太阳系 → 地月系。",
+        bullets: ["可观测宇宙", "银河系", "太阳系", "地月系"],
+        tip: "地球是太阳系中的一颗行星，月球是地球唯一的天然卫星。",
+        view: "hierarchy",
+        globe: {},
+      },
+      {
+        title: "太阳系大家庭",
+        body: "太阳是太阳系的中心天体。八大行星自近及远依次是：水星、金星、地球、火星、木星、土星、天王星、海王星。\n小行星带位于火星和木星之间。",
+        bullets: ["类地行星：水星、金星、地球、火星", "巨行星：木星、土星", "远日行星：天王星、海王星", "小行星带：火星与木星之间"],
+        tip: "口诀：水金地火木土天海。",
+        view: "solar",
+        globe: {},
+        solar: { highlight: null },
+      },
+      {
+        title: "地球为什么有生命",
+        body: "外部条件：太阳光照稳定，宇宙环境安全。\n自身条件：适宜的温度、液态水、适合生物呼吸的大气。",
+        bullets: ["稳定的太阳光照", "安全的宇宙环境", "适宜的温度", "液态水", "适合呼吸的大气"],
+        tip: "答题按“外部两条、自身三条”写，基本不会漏。",
+        view: "solar",
+        globe: {},
+        solar: { highlight: "地球" },
+      },
+    ],
+  },
+  {
+    id: "space",
+    title: "第 20 课 · 太空探索",
+    subtitle: "从人造卫星到中国空间站",
+    steps: [
+      {
+        title: "人类走向太空",
+        body: "1957 年，苏联发射世界第一颗人造地球卫星。\n1961 年，加加林乘“东方 1 号”首次进入太空。\n1969 年，美国“阿波罗 11 号”首次载人登月。",
+        bullets: ["1957：第一颗人造卫星（苏联）", "1961：加加林首次进入太空", "1969：阿波罗 11 号登月"],
+        tip: "三个人类航天“第一”，按时间顺序记。",
+        view: "timeline",
+        globe: {},
+        timeline: { mode: "world" },
+      },
+      {
+        title: "中国航天之路",
+        body: "1970 年，“东方红一号”——中国第一颗人造卫星。\n2003 年，“神舟五号”杨利伟，中国首次载人航天。\n2007 年，“嫦娥一号”首次月球探测。\n2020 年，“天问一号”火星探测、“嫦娥五号”采样返回。\n2021 年，“天和”核心舱发射；2022 年中国空间站全面建成。",
+        bullets: ["1970：东方红一号", "2003：神舟五号（杨利伟）", "2007：嫦娥一号", "2020：天问一号、嫦娥五号", "2021—2022：中国空间站"],
+        tip: "中国航天按“卫星—载人—探月—探火—空间站”五步记。",
+        view: "timeline",
+        globe: {},
+        timeline: { mode: "china" },
+      },
+      {
+        title: "为什么要探索太空",
+        body: "太空探索帮助我们认识宇宙、开发太空资源、推动科技进步，也激发人类的探索精神。\n航天技术还带动了材料、通信、气象、导航等产业的发展。",
+        bullets: ["认识宇宙", "开发资源", "推动科技", "带动产业"],
+        tip: "答“意义”类题，从科学、资源、技术、精神四个角度写。",
+        view: "timeline",
+        globe: {},
+        timeline: { mode: "all" },
       },
     ],
   },

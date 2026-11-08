@@ -7,6 +7,9 @@ import ClimateChart from "./globe/ClimateChart";
 import EarthBasics from "./globe/EarthBasics";
 import MapBasics from "./globe/MapBasics";
 import ContourMap from "./globe/ContourMap";
+import SolarSystem from "./globe/SolarSystem";
+import UniverseHierarchy from "./globe/UniverseHierarchy";
+import SpaceTimeline from "./globe/SpaceTimeline";
 import {
   CHANGJIANG,
   HUANGHE,
@@ -34,6 +37,7 @@ import {
   GEO_KINDS,
   CHINA_KINDS,
   GEO4_KINDS,
+  UNIVERSE_KINDS,
   type Question,
   type QuestionKind,
 } from "./lib/quiz";
@@ -68,7 +72,10 @@ type ViewMode =
   | "climate"
   | "earth"
   | "map"
-  | "contour";
+  | "contour"
+  | "solar"
+  | "hierarchy"
+  | "timeline";
 
 type ClickFeedback = { ok: boolean; reveal: boolean; dist: number; msg: string };
 
@@ -121,6 +128,8 @@ const KIND_LABELS: Record<QuestionKind, string> = {
   map: "地图三要素",
   contour: "等高线",
   adminExtreme: "行政区划之最",
+  universe: "宇宙与太阳系",
+  space: "太空探索",
 };
 
 const OPTION_KEYS = ["A", "B", "C", "D"];
@@ -132,7 +141,9 @@ export default function App() {
 
   const [history, setHistory] = useState<Entry[]>([]);
   const [histIdx, setHistIdx] = useState(-1);
-  const [practiceKind, setPracticeKind] = useState<QuestionKind | "geo" | "china" | "geo4">("geo");
+  const [practiceKind, setPracticeKind] = useState<
+    QuestionKind | "geo" | "china" | "geo4" | "universe"
+  >("geo");
 
   const [wrongbook, setWrongbook] = useState<WrongItem[]>(() => loadWrongBook());
   const [picked, setPicked] = useState<LatLon | null>(null);
@@ -303,11 +314,18 @@ export default function App() {
   }
 
   function makeForScope(
-    scope: QuestionKind | "geo" | "china" | "geo4",
+    scope: QuestionKind | "geo" | "china" | "geo4" | "universe",
     avoidKind?: QuestionKind
   ): Question {
-    if (scope === "geo" || scope === "china" || scope === "geo4") {
-      const pool = scope === "geo" ? GEO_KINDS : scope === "china" ? CHINA_KINDS : GEO4_KINDS;
+    if (scope === "geo" || scope === "china" || scope === "geo4" || scope === "universe") {
+      const pool =
+        scope === "geo"
+          ? GEO_KINDS
+          : scope === "china"
+            ? CHINA_KINDS
+            : scope === "geo4"
+              ? GEO4_KINDS
+              : UNIVERSE_KINDS;
       const choices = avoidKind && pool.length > 1 ? pool.filter((k) => k !== avoidKind) : pool;
       return makeQuestion(choices[Math.floor(Math.random() * choices.length)]);
     }
@@ -331,8 +349,7 @@ export default function App() {
     if (q.kind === "earth" || q.kind === "map" || q.kind === "contour") return "3d";
     return viewForQuestion(q);
   }
-
-  function startPractice(scope?: QuestionKind | "geo" | "china" | "geo4") {
+  function startPractice(scope?: QuestionKind | "geo" | "china" | "geo4" | "universe") {
     const s = scope ?? "geo";
     const q = makeForScope(s);
     setTab("practice");
@@ -527,16 +544,20 @@ export default function App() {
 
   const inChinaPractice = tab === "practice" && !!quiz && CHINA_KINDS.includes(quiz.kind);
   const inGeo4Practice = tab === "practice" && !!quiz && GEO4_KINDS.includes(quiz.kind);
+  const inUniversePractice =
+    tab === "practice" && !!quiz && UNIVERSE_KINDS.includes(quiz.kind);
   const inGeo2Practice =
     tab === "practice" && !!quiz && ["earth", "map", "contour"].includes(quiz.kind);
   const chapter =
-    inGeo4Practice || ["terrain", "climate", "weather", "rivers", "divides"].includes(lesson.id)
-      ? "第 4 章 · 中国的自然环境"
-      : inChinaPractice || ["territory", "admin", "population", "ethnic"].includes(lesson.id)
-        ? "第 3 章 · 中国的疆域和人口"
-        : inGeo2Practice || ["earthbasics", "mapbasics", "contour"].includes(lesson.id)
-          ? "第 2 章 · 地球和地图"
-          : "第 2 章第 1 节 · 地球和地球仪";
+    inUniversePractice || ["universe", "space"].includes(lesson.id)
+      ? "第 1 章 · 地球的宇宙环境"
+      : inGeo4Practice || ["terrain", "climate", "weather", "rivers", "divides"].includes(lesson.id)
+        ? "第 4 章 · 中国的自然环境"
+        : inChinaPractice || ["territory", "admin", "population", "ethnic"].includes(lesson.id)
+          ? "第 3 章 · 中国的疆域和人口"
+          : inGeo2Practice || ["earthbasics", "mapbasics", "contour"].includes(lesson.id)
+            ? "第 2 章 · 地球和地图"
+            : "第 2 章第 1 节 · 地球和地球仪";
 
   return (
     <div className="app">
@@ -557,7 +578,19 @@ export default function App() {
       <main className="layout">
         <section className="stage">
           <div className={viewMode === "split" ? "stage-canvas split" : "stage-canvas"}>
-            {viewMode === "earth" ? (
+            {viewMode === "solar" ? (
+              <div className="pane">
+                <SolarSystem highlight={step.solar?.highlight ?? null} />
+              </div>
+            ) : viewMode === "hierarchy" ? (
+              <div className="pane">
+                <UniverseHierarchy />
+              </div>
+            ) : viewMode === "timeline" ? (
+              <div className="pane">
+                <SpaceTimeline mode={step.timeline?.mode ?? "all"} />
+              </div>
+            ) : viewMode === "earth" ? (
               <div className="pane">
                 <EarthBasics mode={earthMode} />
               </div>
@@ -606,7 +639,7 @@ export default function App() {
             )}
           </div>
 
-          {!["terrain", "climate", "earth", "map", "contour"].includes(viewMode) && (
+          {!["terrain", "climate", "earth", "map", "contour", "solar", "hierarchy", "timeline"].includes(viewMode) && (
             <div className="view-switch">
             <button
               className={viewMode === "3d" ? "on" : ""}
@@ -668,7 +701,13 @@ export default function App() {
                   ? "示意图：西高东低，呈三级阶梯"
                   : viewMode === "climate"
                     ? "左轴气温（℃），右轴降水（mm）"
-                    : "拖动旋转 · 滚轮缩放 · 点击球面读坐标"}
+                    : viewMode === "solar"
+                      ? "太阳系示意图：八大行星围绕太阳公转"
+                      : viewMode === "hierarchy"
+                        ? "天体系统：一层套一层"
+                        : viewMode === "timeline"
+                          ? "太空探索大事记"
+                          : "拖动旋转 · 滚轮缩放 · 点击球面读坐标"}
             {hover && (viewMode === "3d" || viewMode === "flat" || viewMode === "split") && (
               <span className="hover-coord">
                 {fmtCoord({ lat: Math.round(hover.lat), lon: Math.round(hover.lon) })}
@@ -805,6 +844,18 @@ export default function App() {
                     <button className="btn big ghost" onClick={() => startPractice("geo4")}>
                       随机练 · 中国的自然环境
                     </button>
+                    <button className="btn big ghost" onClick={() => startPractice("universe")}>
+                      随机练 · 地球的宇宙环境
+                    </button>
+
+                    <div className="kind-section">第 1 章 · 地球的宇宙环境</div>
+                    <div className="kind-grid">
+                      {UNIVERSE_KINDS.map((k) => (
+                        <button key={k} className="kind-btn" onClick={() => startPractice(k)}>
+                          {KIND_LABELS[k]}
+                        </button>
+                      ))}
+                    </div>
 
                     <div className="kind-section">第 2 章 · 地球和地图</div>
                     <div className="kind-grid">
