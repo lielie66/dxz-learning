@@ -59,10 +59,10 @@ const BASE: Partial<GlobeConfig> = {
   markers: [],
 };
 
-export const LESSONS: Lesson[] = [
+const LESSON_LIST: Lesson[] = [
   {
     id: "lines",
-    title: "第 1 课 · 横纬竖经",
+    title: "第 4 课 · 横纬竖经",
     subtitle: "先把两种线分开",
     steps: [
       {
@@ -113,7 +113,7 @@ export const LESSONS: Lesson[] = [
   },
   {
     id: "lat",
-    title: "第 2 课 · 北纬与南纬",
+    title: "第 5 课 · 北纬与南纬",
     subtitle: "纬度是怎么数出来的",
     steps: [
       {
@@ -147,7 +147,7 @@ export const LESSONS: Lesson[] = [
   },
   {
     id: "lon",
-    title: "第 3 课 · 东经与西经",
+    title: "第 6 课 · 东经与西经",
     subtitle: "经度是怎么数出来的",
     steps: [
       {
@@ -181,7 +181,7 @@ export const LESSONS: Lesson[] = [
   },
   {
     id: "read",
-    title: "第 4 课 · 读一个点的坐标",
+    title: "第 7 课 · 读一个点的坐标",
     subtitle: "先纬后经，两步搞定",
     steps: [
       {
@@ -221,7 +221,7 @@ export const LESSONS: Lesson[] = [
   },
   {
     id: "traps",
-    title: "第 5 课 · 四个最容易错的坑",
+    title: "第 8 课 · 四个最容易错的坑",
     subtitle: "考试就爱在这儿设套",
     steps: [
       {
@@ -253,7 +253,7 @@ export const LESSONS: Lesson[] = [
   },
   {
     id: "map",
-    title: "第 6 课 · 从球面到地图",
+    title: "第 9 课 · 从球面到地图",
     subtitle: "地图上的直线，是怎么来的",
     steps: [
       {
@@ -287,7 +287,7 @@ export const LESSONS: Lesson[] = [
   },
   {
     id: "territory",
-    title: "第 7 课 · 中国的疆域",
+    title: "第 12 课 · 中国的疆域",
     subtitle: "位置、四至、面积与邻国",
     steps: [
       {
@@ -331,7 +331,7 @@ export const LESSONS: Lesson[] = [
   },
   {
     id: "admin",
-    title: "第 8 课 · 行政区划",
+    title: "第 13 课 · 行政区划",
     subtitle: "34 个省级行政区",
     steps: [
       {
@@ -368,7 +368,7 @@ export const LESSONS: Lesson[] = [
   },
   {
     id: "population",
-    title: "第 9 课 · 众多的人口",
+    title: "第 14 课 · 众多的人口",
     subtitle: "14 亿人住在哪里",
     steps: [
       {
@@ -402,7 +402,7 @@ export const LESSONS: Lesson[] = [
   },
   {
     id: "ethnic",
-    title: "第 10 课 · 统一的多民族国家",
+    title: "第 15 课 · 统一的多民族国家",
     subtitle: "56 个民族，一家亲",
     steps: [
       {
@@ -445,7 +445,7 @@ export const LESSONS: Lesson[] = [
   },
   {
     id: "terrain",
-    title: "第 11 课 · 地势与地形",
+    title: "第 16 课 · 地势与地形",
     subtitle: "西高东低，三级阶梯",
     steps: [
       {
@@ -489,7 +489,7 @@ export const LESSONS: Lesson[] = [
   },
   {
     id: "climate",
-    title: "第 12 课 · 气温和降水",
+    title: "第 17 课 · 气温和降水",
     subtitle: "南北温差、东西降水",
     steps: [
       {
@@ -530,7 +530,7 @@ export const LESSONS: Lesson[] = [
   },
   {
     id: "weather",
-    title: "第 13 课 · 天气与气候",
+    title: "第 18 课 · 天气与气候",
     subtitle: "短时间与长期的平均",
     steps: [
       {
@@ -570,7 +570,7 @@ export const LESSONS: Lesson[] = [
   },
   {
     id: "rivers",
-    title: "第 14 课 · 河流和湖泊",
+    title: "第 19 课 · 河流和湖泊",
     subtitle: "长江、黄河与内外流区",
     steps: [
       {
@@ -627,7 +627,7 @@ export const LESSONS: Lesson[] = [
   },
   {
     id: "divides",
-    title: "第 15 课 · 重要地理分界线",
+    title: "第 20 课 · 重要地理分界线",
     subtitle: "秦岭—淮河与阶梯界线",
     steps: [
       {
@@ -680,7 +680,7 @@ export const LESSONS: Lesson[] = [
   },
   {
     id: "earthbasics",
-    title: "第 16 课 · 地球的形状和五带",
+    title: "第 3 课 · 地球的形状和五带",
     subtitle: "从形状到五带",
     steps: [
       {
@@ -714,7 +714,7 @@ export const LESSONS: Lesson[] = [
   },
   {
     id: "mapbasics",
-    title: "第 17 课 · 地图三要素",
+    title: "第 10 课 · 地图三要素",
     subtitle: "比例尺、方向、图例",
     steps: [
       {
@@ -748,7 +748,7 @@ export const LESSONS: Lesson[] = [
   },
   {
     id: "contour",
-    title: "第 18 课 · 等高线地形图",
+    title: "第 11 课 · 等高线地形图",
     subtitle: "把三维地形压成二维",
     steps: [
       {
@@ -782,7 +782,7 @@ export const LESSONS: Lesson[] = [
   },
   {
     id: "universe",
-    title: "第 19 课 · 地球在宇宙中",
+    title: "第 1 课 · 地球在宇宙中",
     subtitle: "天体系统与太阳系",
     steps: [
       {
@@ -815,7 +815,7 @@ export const LESSONS: Lesson[] = [
   },
   {
     id: "space",
-    title: "第 20 课 · 太空探索",
+    title: "第 2 课 · 太空探索",
     subtitle: "从人造卫星到中国空间站",
     steps: [
       {
@@ -848,3 +848,8 @@ export const LESSONS: Lesson[] = [
     ],
   },
 ];
+
+const ORDER: string[] = ['universe', 'space', 'earthbasics', 'lines', 'lat', 'lon', 'read', 'traps', 'map', 'mapbasics', 'contour', 'territory', 'admin', 'population', 'ethnic', 'terrain', 'climate', 'weather', 'rivers', 'divides'];
+export const LESSONS: Lesson[] = [...LESSON_LIST].sort(
+  (a, b) => ORDER.indexOf(a.id) - ORDER.indexOf(b.id)
+);

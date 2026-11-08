@@ -73,15 +73,15 @@ export default function MapBasics({ mode }: Props) {
             <text x="0" y="0" className="mb-strong">没有指向标：上北下南，左西右东</text>
             <rect x="0" y="30" width="300" height="180" rx="8" fill="#f8fafc" stroke="#cbd5e1" />
             <text x="150" y="22" textAnchor="middle" className="mb-sub">北</text>
-            <text x="150" y="230" textAnchor="middle" className="mb-sub">南</text>
+            <text x="150" y="230" textAnchor="middle" className="mb-sub" fill="#1e293b">南</text>
             <text x="-8" y="126" textAnchor="end" className="mb-sub">西</text>
             <text x="308" y="126" className="mb-sub">东</text>
             <circle cx="90" cy="90" r="6" fill="#2563eb" />
-            <text x="102" y="94" className="mb-sub">A</text>
+            <text x="102" y="94" className="mb-sub" fill="#1e293b">A</text>
             <circle cx="220" cy="150" r="6" fill="#2563eb" />
-            <text x="232" y="154" className="mb-sub">B</text>
+            <text x="232" y="154" className="mb-sub" fill="#1e293b">B</text>
             <line x1="90" y1="90" x2="220" y2="150" stroke="#94a3b8" strokeDasharray="4 4" />
-            <text x="150" y="106" className="mb-note">A 在 B 的西北方向</text>
+            <text x="150" y="106" className="mb-note" fill="#92400e">A 在 B 的西北方向</text>
           </g>
 
           <g transform="translate(470,350)">

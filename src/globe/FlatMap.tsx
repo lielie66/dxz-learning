@@ -223,7 +223,7 @@ export default function FlatMap({ config, onPick, onHover }: Props) {
       ctx.strokeRect(x + 0.5, y + 0.5, w - 1, h - 1);
 
       // 纬度刻度
-      ctx.fillStyle = "#5b7290";
+      ctx.fillStyle = "#9fbddc";
       ctx.font = "11px 'PingFang SC','Microsoft YaHei',sans-serif";
       for (const lat of [-60, -30, 0, 30, 60]) {
         const [, py] = project(0, lat);
