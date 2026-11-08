@@ -1282,6 +1282,37 @@ button {
   font-size: 12px;
 }
 
+.valley-mode {
+  display: flex;
+  gap: 6px;
+  margin-right: 8px;
+}
+
+.valley-mode button {
+  border: 1px solid rgba(148, 197, 255, 0.3);
+  background: transparent;
+  color: #8aa8c8;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.valley-mode button.on {
+  background: #dc2626;
+  border-color: #dc2626;
+  color: #fff;
+}
+
+.valley-summary {
+  margin: 6px 0 0;
+  max-width: 760px;
+  color: #a9c1da;
+  font-size: 12px;
+  line-height: 1.6;
+  text-align: center;
+}
+
 .valley-controls input {
   width: 220px;
   accent-color: #dc2626;
