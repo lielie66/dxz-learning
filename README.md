@@ -22,7 +22,7 @@
 
 ## 在线使用
 
-GitHub Pages：**https://lielie66.github.io/geo-lab/**
+GitHub Pages：**https://lielie66.github.io/dxz-learning/**
 
 （如果 Pages 还没生效：在仓库 Settings → Pages 里把 Source 设为 `main` 分支的 `/docs` 目录。）
 
