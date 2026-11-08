@@ -1229,6 +1229,69 @@ button {
   background: rgba(37, 99, 235, 0.92);
 }
 
+/* ---------- 水位解释 ---------- */
+.valley-wrap {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 24px 10px;
+}
+
+.valley-svg {
+  width: 100%;
+  max-width: 980px;
+  height: auto;
+}
+
+.valley-note {
+  fill: #7c5a2e;
+  font-size: 12px;
+}
+
+.valley-small {
+  fill: #8a6a3a;
+  font-size: 11px;
+}
+
+.valley-arrow {
+  fill: #dc2626;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.valley-red {
+  fill: #dc2626;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.valley-blue {
+  fill: #2563eb;
+  font-size: 11px;
+}
+
+.valley-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 6px;
+  color: #cbd5e1;
+  font-size: 12px;
+}
+
+.valley-controls input {
+  width: 220px;
+  accent-color: #dc2626;
+}
+
+.valley-level {
+  color: #e2e8f0;
+  font-weight: 700;
+}
+
 /* ---------- 宇宙与太空 ---------- */
 .solar-wrap,
 .hierarchy-wrap,

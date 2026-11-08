@@ -8,6 +8,7 @@ import EarthBasics from "./globe/EarthBasics";
 import MapBasics from "./globe/MapBasics";
 import ContourMap from "./globe/ContourMap";
 import Terrain3D from "./globe/Terrain3D";
+import ValleyContour from "./globe/ValleyContour";
 import SolarSystem from "./globe/SolarSystem";
 import UniverseHierarchy from "./globe/UniverseHierarchy";
 import SpaceTimeline from "./globe/SpaceTimeline";
@@ -77,7 +78,8 @@ type ViewMode =
   | "solar"
   | "hierarchy"
   | "timeline"
-  | "terrain3d";
+  | "terrain3d"
+  | "valley";
 
 type ClickFeedback = { ok: boolean; reveal: boolean; dist: number; msg: string };
 
@@ -580,7 +582,11 @@ export default function App() {
       <main className="layout">
         <section className="stage">
           <div className={viewMode === "split" ? "stage-canvas split" : "stage-canvas"}>
-            {viewMode === "terrain3d" ? (
+            {viewMode === "valley" ? (
+              <div className="pane">
+                <ValleyContour />
+              </div>
+            ) : viewMode === "terrain3d" ? (
               <div className="pane">
                 <Terrain3D />
               </div>
@@ -645,7 +651,7 @@ export default function App() {
             )}
           </div>
 
-          {!["terrain", "climate", "earth", "map", "contour", "solar", "hierarchy", "timeline", "terrain3d"].includes(viewMode) && (
+          {!["terrain", "climate", "earth", "map", "contour", "solar", "hierarchy", "timeline", "terrain3d", "valley"].includes(viewMode) && (
             <div className="view-switch">
             <button
               className={viewMode === "3d" ? "on" : ""}
@@ -715,7 +721,9 @@ export default function App() {
                           ? "太空探索大事记"
                           : viewMode === "terrain3d"
                             ? "拖动旋转 · 滚轮缩放，看山脊和山谷"
-                            : "拖动旋转 · 滚轮缩放 · 点击球面读坐标"}
+                            : viewMode === "valley"
+                              ? "拖动水位，看等高线怎么移动"
+                              : "拖动旋转 · 滚轮缩放 · 点击球面读坐标"}
             {hover && (viewMode === "3d" || viewMode === "flat" || viewMode === "split") && (
               <span className="hover-coord">
                 {fmtCoord({ lat: Math.round(hover.lat), lon: Math.round(hover.lon) })}

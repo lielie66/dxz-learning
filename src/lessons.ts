@@ -29,7 +29,8 @@ export type LessonStep = {
     | "solar"
     | "hierarchy"
     | "timeline"
-    | "terrain3d";
+    | "terrain3d"
+    | "valley";
   globe: Partial<GlobeConfig>;
   china?: Partial<ChinaConfig>;
   terrain?: { highlight?: 1 | 2 | 3 | null };
@@ -760,6 +761,14 @@ const LESSON_LIST: Lesson[] = [
         view: "contour",
         globe: {},
         contour: { highlight: null },
+      },
+      {
+        title: "一条等高线是怎么切出来的",
+        body: "想象给山谷灌水：水面停在某一高度时，水面和山坡的交线，就是一条等高线。\n拖动下面的水位，看这条线怎么移动。",
+        bullets: ["水位越高，等高线越靠上游", "水位越低，等高线越靠下游", "所以山谷的 V 尖指向高处（上游）"],
+        tip: "拖一拖水位滑块：红色 V 尖永远朝上游翘。",
+        view: "valley",
+        globe: {},
       },
       {
         title: "转一转：山脊和山谷",
