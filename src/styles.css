@@ -1092,6 +1092,118 @@ button {
   font-weight: 600;
 }
 
+/* ---------- 地球与五带 ---------- */
+.earth-wrap,
+.map-basics,
+.contour-wrap {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 26px 10px;
+}
+
+.earth-svg,
+.map-svg,
+.contour-svg {
+  width: 100%;
+  max-width: 980px;
+  height: auto;
+}
+
+.earth-title {
+  fill: #e2e8f0;
+  font-size: 19px;
+  font-weight: 700;
+}
+
+.earth-sub {
+  fill: #a9c1da;
+  font-size: 12px;
+}
+
+.earth-note {
+  fill: #cbd5e1;
+  font-size: 12px;
+}
+
+.earth-note-dark {
+  fill: #9a3412;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.earth-axis {
+  fill: #cbd5e1;
+  font-size: 11px;
+}
+
+.earth-zone {
+  fill: #e2e8f0;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.earth-caption {
+  margin: 10px 0 0;
+  color: #7f9cbb;
+  font-size: 12px;
+}
+
+/* ---------- 地图三要素 ---------- */
+.mb-title {
+  fill: #e2e8f0;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.mb-strong {
+  fill: #dbeafe;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.mb-sub {
+  fill: #a9c1da;
+  font-size: 12px;
+}
+
+.mb-note {
+  fill: #fbbf24;
+  font-size: 12px;
+}
+
+.mb-symbol {
+  fill: #1e293b;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+/* ---------- 等高线 ---------- */
+.contour-label {
+  fill: #7c2d12;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.contour-label.on {
+  fill: #dc2626;
+  font-size: 15px;
+}
+
+.contour-note {
+  fill: #92400e;
+  font-size: 11px;
+}
+
+.contour-caption {
+  margin: 8px 0 0;
+  color: #a9c1da;
+  font-size: 12px;
+}
+
 /* ---------- 响应式 ---------- */
 @media (max-width: 1024px) {
   body {

@@ -35,7 +35,11 @@ export type QuestionKind =
   | "climateType"
   | "climateFeature"
   | "river"
-  | "boundary";
+  | "boundary"
+  | "earth"
+  | "map"
+  | "contour"
+  | "adminExtreme";
 
 export type ChinaVisual = {
   highlights?: string[];
@@ -91,6 +95,10 @@ const TAGS: Record<QuestionKind, string> = {
   climateFeature: "气温与降水",
   river: "河流湖泊",
   boundary: "地理分界线",
+  earth: "地球与五带",
+  map: "地图三要素",
+  contour: "等高线",
+  adminExtreme: "行政区划之最",
 };
 
 function shuffleWithAnswer(correct: string, distractors: string[]): { options: string[]; answer: number } {
@@ -1000,6 +1008,308 @@ export function makeBoundary(): Question {
   };
 }
 
+// ---------- 期中补充：地球、地图、等高线、行政区划之最 ----------
+
+const EARTH_TPL: Geo4Tpl[] = [
+  {
+    prompt: "地球的真实形状是？",
+    correct: "两极稍扁、赤道略鼓的不规则椭球体",
+    pool: ["两极稍扁、赤道略鼓的不规则椭球体", "正球体", "两极略鼓、赤道稍扁的椭球体", "扁平的圆盘"],
+    explain: "地球是一个两极稍扁、赤道略鼓的不规则椭球体。",
+  },
+  {
+    prompt: "地球的平均半径约为？",
+    correct: "6371 千米",
+    pool: ["6371 千米", "4 万千米", "5.1 亿千米", "12742 千米"],
+    explain: "地球平均半径约 6371 千米，赤道周长约 4 万千米。",
+  },
+  {
+    prompt: "地球赤道周长约为？",
+    correct: "4 万千米",
+    pool: ["4 万千米", "6371 千米", "5.1 亿千米", "2 万千米"],
+    explain: "赤道周长约 4 万千米，约 8 万里。",
+  },
+  {
+    prompt: "地球表面积约为？",
+    correct: "5.1 亿平方千米",
+    pool: ["5.1 亿平方千米", "960 万平方千米", "4 万平方千米", "1.5 亿平方千米"],
+    explain: "地球表面积约 5.1 亿平方千米。",
+  },
+  {
+    prompt: "热带与温带的分界线是？",
+    correct: "回归线（23.5°）",
+    pool: ["回归线（23.5°）", "极圈（66.5°）", "赤道（0°）", "本初子午线（0°）"],
+    explain: "回归线是热带与温带的分界，极圈是温带与寒带的分界。",
+  },
+  {
+    prompt: "温带与寒带的分界线是？",
+    correct: "极圈（66.5°）",
+    pool: ["极圈（66.5°）", "回归线（23.5°）", "赤道（0°）", "30°纬线"],
+    explain: "极圈是温带与寒带的分界。",
+  },
+  {
+    prompt: "有阳光直射现象的是哪个温度带？",
+    correct: "热带",
+    pool: ["热带", "北温带", "南温带", "寒带"],
+    explain: "热带位于南北回归线之间，有阳光直射现象。",
+  },
+  {
+    prompt: "有极昼极夜现象的是哪个温度带？",
+    correct: "寒带",
+    pool: ["寒带", "热带", "温带", "亚热带"],
+    explain: "寒带位于极圈以内，有极昼极夜现象。",
+  },
+  {
+    prompt: "四季分明的是哪个温度带？",
+    correct: "温带",
+    pool: ["温带", "热带", "寒带", "热带和寒带"],
+    explain: "温带既无阳光直射，也无极昼极夜，四季分明。",
+  },
+];
+
+export function makeEarth(): Question {
+  const t = EARTH_TPL[drawBag("earth", EARTH_TPL.length)];
+  const { options, answer } = shuffleWithAnswer(t.correct, t.pool.filter((x) => x !== t.correct));
+  return {
+    kind: "earth",
+    tag: TAGS.earth,
+    prompt: t.prompt,
+    options,
+    answer,
+    explain: t.explain,
+    sig: `ea:${t.prompt}`,
+  };
+}
+
+const MAP_TPL: Geo4Tpl[] = [
+  {
+    prompt: "地图的三要素是？",
+    correct: "比例尺、方向、图例",
+    pool: ["比例尺、方向、图例", "经线、纬线、方向", "图名、图例、注记", "比例尺、经纬网、等高线"],
+    explain: "地图三要素是比例尺、方向和图例。",
+  },
+  {
+    prompt: "比例尺的计算公式是？",
+    correct: "图上距离 ÷ 实地距离",
+    pool: ["图上距离 ÷ 实地距离", "实地距离 ÷ 图上距离", "图上距离 × 实地距离", "实地距离 − 图上距离"],
+    explain: "比例尺 = 图上距离 ÷ 实地距离。",
+  },
+  {
+    prompt: "图幅相同的地图，比例尺越大，表示的范围和内容？",
+    correct: "范围越小，内容越详细",
+    pool: ["范围越小，内容越详细", "范围越大，内容越简略", "范围越大，内容越详细", "范围越小，内容越简略"],
+    explain: "图幅相同，比例尺越大 → 范围越小 → 内容越详细。",
+  },
+  {
+    prompt: "比例尺 1:100000 表示图上 1 厘米代表实地多少？",
+    correct: "1 千米",
+    pool: ["1 千米", "10 千米", "100 千米", "100 米"],
+    explain: "1:100000 表示图上 1 厘米代表实地 100000 厘米，即 1 千米。",
+  },
+  {
+    prompt: "1 千米等于多少厘米？",
+    correct: "100000 厘米",
+    pool: ["100000 厘米", "10000 厘米", "1000 厘米", "1000000 厘米"],
+    explain: "1 千米 = 1000 米 = 100000 厘米。",
+  },
+  {
+    prompt: "有指向标的地图，箭头一般指向？",
+    correct: "北方",
+    pool: ["北方", "南方", "东方", "西方"],
+    explain: "指向标的箭头一般指向北方。",
+  },
+  {
+    prompt: "没有指向标、也没有经纬网的地图，通常怎么定方向？",
+    correct: "上北下南，左西右东",
+    pool: ["上北下南，左西右东", "上南下北，左东右西", "上东下西，左北右南", "按太阳方向"],
+    explain: "没有指向标的地图，通常采用“上北下南，左西右东”。",
+  },
+  {
+    prompt: "在经纬网地图上，经线指示什么方向？",
+    correct: "南北方向",
+    pool: ["南北方向", "东西方向", "东北方向", "西南方向"],
+    explain: "经线指示南北方向，纬线指示东西方向。",
+  },
+];
+
+export function makeMap(): Question {
+  const t = MAP_TPL[drawBag("map", MAP_TPL.length)];
+  const { options, answer } = shuffleWithAnswer(t.correct, t.pool.filter((x) => x !== t.correct));
+  return {
+    kind: "map",
+    tag: TAGS.map,
+    prompt: t.prompt,
+    options,
+    answer,
+    explain: t.explain,
+    sig: `mp:${t.prompt}`,
+  };
+}
+
+const CONTOUR_TPL: Geo4Tpl[] = [
+  {
+    prompt: "等高线是指？",
+    correct: "海拔相同的点连成的线",
+    pool: ["海拔相同的点连成的线", "相对高度相同的点连成的线", "坡度相同的点连成的线", "河流流经的线"],
+    explain: "等高线是把海拔相同的点连接成的线。",
+  },
+  {
+    prompt: "等高距是指？",
+    correct: "相邻两条等高线的高度差",
+    pool: ["相邻两条等高线的高度差", "两条等高线的水平距离", "山顶到山脚的垂直距离", "等高线的长度"],
+    explain: "等高距是相邻两条等高线之间的高度差。",
+  },
+  {
+    prompt: "等高线密集的地方，坡度？",
+    correct: "陡",
+    pool: ["陡", "缓", "平坦", "无法判断"],
+    explain: "等高线越密集，坡度越陡；越稀疏，坡度越缓。",
+  },
+  {
+    prompt: "两个山顶之间低洼的部分叫？",
+    correct: "鞍部",
+    pool: ["鞍部", "山顶", "陡崖", "山谷"],
+    explain: "两个山顶之间低洼的部分是鞍部。",
+  },
+  {
+    prompt: "等高线重合的地方是？",
+    correct: "陡崖",
+    pool: ["陡崖", "鞍部", "山脊", "山谷"],
+    explain: "等高线重合的地方是陡崖。",
+  },
+  {
+    prompt: "等高线凸向低处的地形部位是？",
+    correct: "山脊",
+    pool: ["山脊", "山谷", "鞍部", "陡崖"],
+    explain: "等高线凸向低处为山脊，凸向高处为山谷。",
+  },
+  {
+    prompt: "河流一般发育在哪种地形部位？",
+    correct: "山谷",
+    pool: ["山谷", "山脊", "鞍部", "陡崖"],
+    explain: "山谷容易汇集水流，河流一般发育在山谷。",
+  },
+  {
+    prompt: "攀岩活动一般选择在？",
+    correct: "陡崖",
+    pool: ["陡崖", "缓坡", "鞍部", "山顶"],
+    explain: "陡崖处坡度陡，适合攀岩。",
+  },
+  {
+    prompt: "登山时，选择哪条路线更省力？",
+    correct: "等高线稀疏的缓坡",
+    pool: ["等高线稀疏的缓坡", "等高线密集的陡坡", "陡崖", "任意路线都一样"],
+    explain: "等高线稀疏的地方坡度缓，登山更省力。",
+  },
+  {
+    prompt: "修建水库，坝址一般选在？",
+    correct: "峡谷或口袋形洼地",
+    pool: ["峡谷或口袋形洼地", "山顶", "缓坡", "鞍部"],
+    explain: "坝址选在峡谷或口袋形洼地，工程量小、库容大。",
+  },
+];
+
+export function makeContour(): Question {
+  const t = CONTOUR_TPL[drawBag("contour", CONTOUR_TPL.length)];
+  const { options, answer } = shuffleWithAnswer(t.correct, t.pool.filter((x) => x !== t.correct));
+  return {
+    kind: "contour",
+    tag: TAGS.contour,
+    prompt: t.prompt,
+    options,
+    answer,
+    explain: t.explain,
+    sig: `cn:${t.prompt}`,
+  };
+}
+
+type AdminTpl = Geo4Tpl & { province?: string };
+
+const ADMIN_TPL: AdminTpl[] = [
+  {
+    prompt: "我国跨纬度最广的省级行政区是？",
+    correct: "海南省",
+    pool: ["海南省", "黑龙江省", "内蒙古自治区", "新疆维吾尔自治区"],
+    explain: "海南省跨纬度最广，从约 4°N 到 20°N 左右。",
+    province: "海南省",
+  },
+  {
+    prompt: "我国跨经度最广的省级行政区是？",
+    correct: "内蒙古自治区",
+    pool: ["内蒙古自治区", "新疆维吾尔自治区", "西藏自治区", "青海省"],
+    explain: "内蒙古自治区东西狭长，跨经度最广。",
+    province: "内蒙古自治区",
+  },
+  {
+    prompt: "我国面积最大的省级行政区是？",
+    correct: "新疆维吾尔自治区",
+    pool: ["新疆维吾尔自治区", "西藏自治区", "内蒙古自治区", "青海省"],
+    explain: "新疆面积约 166 万平方千米，是我国面积最大的省级行政区。",
+    province: "新疆维吾尔自治区",
+  },
+  {
+    prompt: "我国面积最小的省级行政区是？",
+    correct: "澳门特别行政区",
+    pool: ["澳门特别行政区", "香港特别行政区", "上海市", "天津市"],
+    explain: "澳门特别行政区面积最小。",
+    province: "澳门特别行政区",
+  },
+  {
+    prompt: "我国陆上邻国最多的省级行政区是？",
+    correct: "新疆维吾尔自治区",
+    pool: ["新疆维吾尔自治区", "西藏自治区", "内蒙古自治区", "云南省"],
+    explain: "新疆维吾尔自治区与多个国家接壤，陆上邻国最多。",
+    province: "新疆维吾尔自治区",
+  },
+  {
+    prompt: "我国临省最多的省级行政区之一是？",
+    correct: "内蒙古自治区",
+    pool: ["内蒙古自治区", "新疆维吾尔自治区", "西藏自治区", "青海省"],
+    explain: "内蒙古自治区和陕西省都邻接 8 个省级行政区。",
+    province: "内蒙古自治区",
+  },
+  {
+    prompt: "既临渤海又临黄海的省级行政区是？",
+    correct: "山东省",
+    pool: ["山东省", "江苏省", "河北省", "浙江省"],
+    explain: "山东省和辽宁省既临渤海又临黄海。",
+    province: "山东省",
+  },
+  {
+    prompt: "既有国界线又有海岸线的省级行政区是？",
+    correct: "辽宁省",
+    pool: ["辽宁省", "山东省", "河北省", "江苏省"],
+    explain: "辽宁省和广西壮族自治区既有国界线又有海岸线。",
+    province: "辽宁省",
+  },
+  {
+    prompt: "北回归线自东向西穿过的省级行政区依次是？",
+    correct: "台湾省、广东省、广西壮族自治区、云南省",
+    pool: [
+      "台湾省、广东省、广西壮族自治区、云南省",
+      "台湾省、福建省、广东省、云南省",
+      "广东省、广西壮族自治区、云南省、台湾省",
+      "云南省、广西壮族自治区、广东省、台湾省",
+    ],
+    explain: "北回归线自东向西穿过台湾省、广东省、广西壮族自治区、云南省。",
+  },
+];
+
+export function makeAdminExtreme(): Question {
+  const t = ADMIN_TPL[drawBag("admin", ADMIN_TPL.length)];
+  const { options, answer } = shuffleWithAnswer(t.correct, t.pool.filter((x) => x !== t.correct));
+  return {
+    kind: "adminExtreme",
+    tag: TAGS.adminExtreme,
+    prompt: t.prompt,
+    options,
+    answer,
+    explain: t.explain,
+    chinaVisual: t.province ? { highlights: [t.province] } : {},
+    sig: `ad:${t.prompt}`,
+  };
+}
+
 const MAKERS: Record<QuestionKind, () => Question> = {
   lineType: makeLineType,
   readCoord: makeReadCoord,
@@ -1019,6 +1329,10 @@ const MAKERS: Record<QuestionKind, () => Question> = {
   climateFeature: makeClimateFeature,
   river: makeRiver,
   boundary: makeBoundary,
+  earth: makeEarth,
+  map: makeMap,
+  contour: makeContour,
+  adminExtreme: makeAdminExtreme,
 };
 
 export const GEO_KINDS: QuestionKind[] = [
@@ -1029,6 +1343,9 @@ export const GEO_KINDS: QuestionKind[] = [
   "symmetry",
   "direction",
   "clickCoord",
+  "earth",
+  "map",
+  "contour",
 ];
 
 export const GEO4_KINDS: QuestionKind[] = [
@@ -1046,6 +1363,7 @@ export const CHINA_KINDS: QuestionKind[] = [
   "territory",
   "population",
   "ethnic",
+  "adminExtreme",
 ];
 
 function fresh(kind: QuestionKind): Question {

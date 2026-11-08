@@ -16,11 +16,23 @@ export type LessonStep = {
   body: string;
   bullets?: string[];
   tip?: string;
-  view?: "3d" | "flat" | "split" | "china" | "terrain" | "climate";
+  view?:
+    | "3d"
+    | "flat"
+    | "split"
+    | "china"
+    | "terrain"
+    | "climate"
+    | "earth"
+    | "map"
+    | "contour";
   globe: Partial<GlobeConfig>;
   china?: Partial<ChinaConfig>;
   terrain?: { highlight?: 1 | 2 | 3 | null };
   climate?: { cities: string[] };
+  earth?: { mode: "shape" | "zones" };
+  map?: { mode: "scale" | "direction" | "legend" };
+  contour?: { highlight?: "peak" | "saddle" | "cliff" | "ridge" | "valley" | null };
 };
 
 export type Lesson = {
@@ -658,6 +670,108 @@ export const LESSONS: Lesson[] = [
           showNames: false,
           polylines: [QINLING_HUAIHE],
         },
+      },
+    ],
+  },
+  {
+    id: "earthbasics",
+    title: "第 16 课 · 地球的形状和五带",
+    subtitle: "从形状到五带",
+    steps: [
+      {
+        title: "地球是什么形状",
+        body: "地球是一个两极稍扁、赤道略鼓的不规则椭球体。\n平均半径约 6371 千米，赤道周长约 4 万千米，表面积约 5.1 亿平方千米。",
+        bullets: ["两极稍扁、赤道略鼓", "平均半径 6371 千米", "赤道周长约 4 万千米", "表面积约 5.1 亿平方千米"],
+        tip: "证据：远航船只先见桅杆、登高望远、月食、麦哲伦环球航行、卫星照片。",
+        view: "earth",
+        globe: {},
+        earth: { mode: "shape" },
+      },
+      {
+        title: "五带是怎么划分的",
+        body: "人们根据太阳热量在地表的分布，把地球表面划分为五带：热带、北温带、南温带、北寒带、南寒带。\n回归线（23.5°）是热带与温带的分界，极圈（66.5°）是温带与寒带的分界。",
+        bullets: ["热带：23.5°S—23.5°N", "温带：23.5°—66.5°", "寒带：66.5°—90°"],
+        tip: "先记两条线：23.5° 回归线、66.5° 极圈。",
+        view: "earth",
+        globe: {},
+        earth: { mode: "zones" },
+      },
+      {
+        title: "五带各有什么特点",
+        body: "热带终年炎热，有阳光直射；寒带终年寒冷，有极昼极夜；温带四季分明，既无阳光直射，也无极昼极夜。\n我国大部分位于北温带，南部一小部分在热带。",
+        bullets: ["热带：终年炎热，有直射", "温带：四季分明", "寒带：终年寒冷，有极昼极夜"],
+        tip: "“我国大部分在北温带”这句话，和五带图一起记。",
+        view: "earth",
+        globe: {},
+        earth: { mode: "zones" },
+      },
+    ],
+  },
+  {
+    id: "mapbasics",
+    title: "第 17 课 · 地图三要素",
+    subtitle: "比例尺、方向、图例",
+    steps: [
+      {
+        title: "比例尺：图上距离与实地距离的比",
+        body: "比例尺 = 图上距离 ÷ 实地距离。\n图幅相同的地图，比例尺越小，表示范围越大，内容越简略；比例尺越大，表示范围越小，内容越详细。",
+        bullets: ["数字式：1:100000", "文字式：图上 1 厘米代表实地 1 千米", "线段式：一段线段代表一定实地距离", "1 千米 = 100000 厘米"],
+        tip: "比例尺是分式，分母越大，比例尺越小。",
+        view: "map",
+        globe: {},
+        map: { mode: "scale" },
+      },
+      {
+        title: "方向：三种判断方法",
+        body: "有指向标的地图，箭头一般指向北方。\n没有指向标的地图，通常“上北下南，左西右东”。\n有经纬网的地图，经线指示南北，纬线指示东西。",
+        bullets: ["指向标：箭头指北", "一般定向：上北下南，左西右东", "经纬网：经线南北，纬线东西"],
+        tip: "先看有没有指向标，再看有没有经纬网，最后才用“上北下南”。",
+        view: "map",
+        globe: {},
+        map: { mode: "direction" },
+      },
+      {
+        title: "图例：地图的语言",
+        body: "图例是对地图上各种符号和注记的说明。\n首都、城市、铁路、公路、河流、湖泊、山峰、等高线、国界、省界，都有固定的符号。",
+        bullets: ["看图先看图例", "同类地图的图例基本一致", "注记包括文字和数字"],
+        tip: "考试给一幅新图，第一件事是看图例和比例尺。",
+        view: "map",
+        globe: {},
+        map: { mode: "legend" },
+      },
+    ],
+  },
+  {
+    id: "contour",
+    title: "第 18 课 · 等高线地形图",
+    subtitle: "把三维地形压成二维",
+    steps: [
+      {
+        title: "等高线和等高距",
+        body: "等高线是把海拔相同的点连接成的线。\n相邻两条等高线的高度差叫等高距。等高线上的数值是海拔，单位是米。",
+        bullets: ["等高线：海拔相同的点连成的线", "等高距：相邻等高线的高度差", "数值越大，海拔越高"],
+        tip: "等高线越密，坡越陡；越稀，坡越缓。",
+        view: "contour",
+        globe: {},
+        contour: { highlight: null },
+      },
+      {
+        title: "五个部位：山顶、鞍部、陡崖、山脊、山谷",
+        body: "山顶：等高线闭合，数值中间高、四周低。\n鞍部：两个山顶之间低洼的部分。\n陡崖：等高线重合的地方。\n山脊：等高线凸向低处。\n山谷：等高线凸向高处。",
+        bullets: ["山顶：闭合，中间高", "鞍部：两山顶之间", "陡崖：等高线重合", "山脊：凸向低处", "山谷：凸向高处"],
+        tip: "口诀：凸低为脊，凸高为谷。",
+        view: "contour",
+        globe: {},
+        contour: { highlight: null },
+      },
+      {
+        title: "等高线的应用",
+        body: "河流发育在山谷，从海拔高处流向低处。\n登山走等高线稀疏的缓坡更省力；攀岩在陡崖；水库坝址选在峡谷或“口袋形”洼地，工程量小、库容大。",
+        bullets: ["河流：山谷，高处流向低处", "登山：缓坡，等高线稀疏", "攀岩：陡崖", "水库：峡谷、口袋形洼地"],
+        tip: "判断河流位置，先找山谷；判断登山路线，先看疏密。",
+        view: "contour",
+        globe: {},
+        contour: { highlight: "valley" },
       },
     ],
   },

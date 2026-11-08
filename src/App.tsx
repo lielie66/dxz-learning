@@ -4,6 +4,9 @@ import FlatMap from "./globe/FlatMap";
 import ChinaMap, { defaultChinaConfig, type ChinaConfig } from "./globe/ChinaMap";
 import TerrainProfile from "./globe/TerrainProfile";
 import ClimateChart from "./globe/ClimateChart";
+import EarthBasics from "./globe/EarthBasics";
+import MapBasics from "./globe/MapBasics";
+import ContourMap from "./globe/ContourMap";
 import {
   CHANGJIANG,
   HUANGHE,
@@ -56,7 +59,16 @@ import {
 import "./styles.css";
 
 type Tab = "learn" | "practice" | "wrong";
-type ViewMode = "3d" | "flat" | "split" | "china" | "terrain" | "climate";
+type ViewMode =
+  | "3d"
+  | "flat"
+  | "split"
+  | "china"
+  | "terrain"
+  | "climate"
+  | "earth"
+  | "map"
+  | "contour";
 
 type ClickFeedback = { ok: boolean; reveal: boolean; dist: number; msg: string };
 
@@ -105,6 +117,10 @@ const KIND_LABELS: Record<QuestionKind, string> = {
   climateFeature: "气温降水",
   river: "河流湖泊",
   boundary: "地理分界线",
+  earth: "地球与五带",
+  map: "地图三要素",
+  contour: "等高线",
+  adminExtreme: "行政区划之最",
 };
 
 const OPTION_KEYS = ["A", "B", "C", "D"];
@@ -143,6 +159,12 @@ export default function App() {
   useEffect(() => {
     setViewMode(step.view ?? "3d");
   }, [lessonIdx, stepIdx]);
+
+  useEffect(() => {
+    if (tab === "practice" && chosen !== null && quiz) {
+      setViewMode(viewForQuestion(quiz));
+    }
+  }, [chosen, quiz, tab]);
 
   const stats = useMemo(() => wrongStats(wrongbook), [wrongbook]);
 
@@ -249,6 +271,27 @@ export default function App() {
       ? quiz?.geo4Visual?.terrain ?? null
       : step.terrain?.highlight ?? null;
 
+  const earthMode =
+    tab === "practice" && quiz?.kind === "earth"
+      ? /五带|温度带|热带|寒带|温带|回归线|极圈|直射|极昼|四季/.test(quiz.prompt)
+        ? "zones"
+        : "shape"
+      : step.earth?.mode ?? "shape";
+
+  const mapMode =
+    tab === "practice" && quiz?.kind === "map"
+      ? /比例尺|千米|厘米/.test(quiz.prompt)
+        ? "scale"
+        : /方向|指向标|经线|纬线/.test(quiz.prompt)
+          ? "direction"
+          : "legend"
+      : step.map?.mode ?? "scale";
+
+  const contourHighlight =
+    tab === "practice" && quiz?.kind === "contour"
+      ? null
+      : step.contour?.highlight ?? null;
+
   function updateEntry(patch: Partial<Entry>) {
     setHistory((h) => h.map((e, i) => (i === histIdx ? { ...e, ...patch } : e)));
   }
@@ -272,6 +315,9 @@ export default function App() {
   }
 
   function viewForQuestion(q: Question): ViewMode {
+    if (q.kind === "earth") return "earth";
+    if (q.kind === "map") return "map";
+    if (q.kind === "contour") return "contour";
     if (q.geo4Visual) {
       if (q.geo4Visual.climateCity) return "climate";
       if (q.geo4Visual.terrain) return "terrain";
@@ -279,6 +325,11 @@ export default function App() {
     }
     if (CHINA_KINDS.includes(q.kind)) return "china";
     return "3d";
+  }
+
+  function initialView(q: Question): ViewMode {
+    if (q.kind === "earth" || q.kind === "map" || q.kind === "contour") return "3d";
+    return viewForQuestion(q);
   }
 
   function startPractice(scope?: QuestionKind | "geo" | "china" | "geo4") {
@@ -289,7 +340,7 @@ export default function App() {
     setHistory([newEntry(q, null)]);
     setHistIdx(0);
     setPicked(null);
-    setViewMode(viewForQuestion(q));
+    setViewMode(initialView(q));
   }
 
   function startReview(items: WrongItem[]) {
@@ -304,7 +355,7 @@ export default function App() {
     const entries = items.map((it) => newEntry(makeVariant(it.kind), it));
     setHistory(entries);
     setHistIdx(0);
-    setViewMode(viewForQuestion(entries[0].q));
+    setViewMode(initialView(entries[0].q));
   }
 
   function answer(i: number) {
@@ -404,7 +455,7 @@ export default function App() {
     const q = makeForScope(practiceKind, quiz?.kind);
     setHistory((h) => [...h, newEntry(q, null)]);
     setHistIdx(histIdx + 1);
-    setViewMode(viewForQuestion(q));
+    setViewMode(initialView(q));
   }
 
   function prevQuestion() {
@@ -476,11 +527,16 @@ export default function App() {
 
   const inChinaPractice = tab === "practice" && !!quiz && CHINA_KINDS.includes(quiz.kind);
   const inGeo4Practice = tab === "practice" && !!quiz && GEO4_KINDS.includes(quiz.kind);
-  const chapter = inGeo4Practice || ["terrain", "climate", "weather", "rivers", "divides"].includes(lesson.id)
-    ? "第 4 章 · 中国的自然环境"
-    : inChinaPractice || ["territory", "admin", "population", "ethnic"].includes(lesson.id)
-      ? "第 3 章 · 中国的疆域和人口"
-      : "第 2 章第 1 节 · 地球和地球仪";
+  const inGeo2Practice =
+    tab === "practice" && !!quiz && ["earth", "map", "contour"].includes(quiz.kind);
+  const chapter =
+    inGeo4Practice || ["terrain", "climate", "weather", "rivers", "divides"].includes(lesson.id)
+      ? "第 4 章 · 中国的自然环境"
+      : inChinaPractice || ["territory", "admin", "population", "ethnic"].includes(lesson.id)
+        ? "第 3 章 · 中国的疆域和人口"
+        : inGeo2Practice || ["earthbasics", "mapbasics", "contour"].includes(lesson.id)
+          ? "第 2 章 · 地球和地图"
+          : "第 2 章第 1 节 · 地球和地球仪";
 
   return (
     <div className="app">
@@ -501,7 +557,19 @@ export default function App() {
       <main className="layout">
         <section className="stage">
           <div className={viewMode === "split" ? "stage-canvas split" : "stage-canvas"}>
-            {viewMode === "terrain" ? (
+            {viewMode === "earth" ? (
+              <div className="pane">
+                <EarthBasics mode={earthMode} />
+              </div>
+            ) : viewMode === "map" ? (
+              <div className="pane">
+                <MapBasics mode={mapMode} />
+              </div>
+            ) : viewMode === "contour" ? (
+              <div className="pane">
+                <ContourMap highlight={contourHighlight} />
+              </div>
+            ) : viewMode === "terrain" ? (
               <div className="pane">
                 <TerrainProfile highlight={terrainHighlight} />
               </div>
@@ -538,7 +606,7 @@ export default function App() {
             )}
           </div>
 
-          {viewMode !== "terrain" && viewMode !== "climate" && (
+          {!["terrain", "climate", "earth", "map", "contour"].includes(viewMode) && (
             <div className="view-switch">
             <button
               className={viewMode === "3d" ? "on" : ""}
