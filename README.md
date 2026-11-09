@@ -4,6 +4,18 @@
 
 不需要后端、不需要联网。构建产物是一个可以直接双击打开的 HTML 文件。
 
+> **国内镜像**：[gitee.com/acef09/dxz-learning](https://gitee.com/acef09/dxz-learning)　·　**离线包**：[geo-lab-offline.zip](https://gitee.com/acef09/dxz-learning/raw/main/release/geo-lab-offline.zip)
+>
+> 如果这个项目对你有帮助，欢迎在 [GitHub](https://github.com/lielie66/dxz-learning) 点一个 ⭐ Star。
+
+[English](README.en.md)
+
+## 背景
+
+孩子刚上初一，经纬网、等高线这些抽象概念，用课本上的平面图讲不清。于是做了这个能转、能点、能拖、能练的工具：先让她看懂，再通过随机题和错题本反复练。
+
+现在覆盖中图版七年级上册全部四章，20 节课、24 类题，打包成一个 1.4 MB 的 HTML，双击就能用，不需要服务器。
+
 ![3D 地球仪](assets/globe.jpeg)
 
 ![中国地图](assets/china.jpeg)
@@ -22,14 +34,16 @@
 
 ## 在线使用
 
-GitHub Pages：**https://lielie66.github.io/dxz-learning/**
+- **GitHub Pages**（海外 / 能访问 GitHub）：**https://lielie66.github.io/dxz-learning/**
+- **Gitee Pages**（国内，开通后）：**https://acef09.gitee.io/dxz-learning/**
+- 两个都打不开时：下载离线包，解压后双击 `地理实验室.html`
 
-（如果 Pages 还没生效：在仓库 Settings → Pages 里把 Source 设为 `main` 分支的 `/docs` 目录。）
+（GitHub Pages 如果还没生效：在仓库 Settings → Pages 里把 Source 设为 `main` 分支的 `/docs` 目录。）
 
 ## 离线使用
 
-1. 下载仓库里的 `docs/index.html`
-2. 双击打开（推荐 Chrome / Edge）
+1. 下载仓库里的 `docs/index.html`，或直接下载 [geo-lab-offline.zip](https://gitee.com/acef09/dxz-learning/raw/main/release/geo-lab-offline.zip)
+2. 解压后双击 `地理实验室.html`（推荐 Chrome / Edge）
 3. 无需安装、无需联网
 
 错题记录保存在浏览器 localStorage，不上传、不联网。换浏览器或清缓存会丢失。
@@ -113,6 +127,12 @@ src/
 - 世界陆地轮廓来自 [world-atlas](https://github.com/topojson/world-atlas)（Natural Earth 110m，公有领域）。
 - 教材目录与知识点依据中图版 2024 年版七年级上册，教材内容版权归中国地图出版社所有；本项目只做知识点的可视化与练习，不包含教材原文。
 - 人口数据采用 2020 年第七次全国人口普查口径（约 14.1 亿）。
+
+## 支持这个项目
+
+如果它帮到了你或孩子，欢迎在 [GitHub](https://github.com/lielie66/dxz-learning) 点一个 ⭐ Star，或转给需要的家长和老师。
+
+国内访问 GitHub 不稳定时，可以用 [Gitee 镜像](https://gitee.com/acef09/dxz-learning)。
 
 ## 许可以及贡献
 
