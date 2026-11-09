@@ -10,9 +10,10 @@ No backend, no account, no network required. The production build is a **single 
 
 ## Links
 
+- **Live demo (China-friendly)**: https://dxz.flowzen.cn/
 - **GitHub**: https://github.com/lielie66/dxz-learning
 - **Gitee mirror (China)**: https://gitee.com/acef09/dxz-learning
-- **Live demo**: https://lielie66.github.io/dxz-learning/
+- **GitHub Pages mirror**: https://lielie66.github.io/dxz-learning/
 - **Offline zip**: https://gitee.com/acef09/dxz-learning/raw/main/release/geo-lab-offline.zip
 
 ## Why

@@ -4,7 +4,7 @@
 
 不需要后端、不需要联网。构建产物是一个可以直接双击打开的 HTML 文件。
 
-> **国内镜像**：[gitee.com/acef09/dxz-learning](https://gitee.com/acef09/dxz-learning)　·　**离线包**：[geo-lab-offline.zip](https://gitee.com/acef09/dxz-learning/raw/main/release/geo-lab-offline.zip)
+> **一键打开**：[dxz.flowzen.cn](https://dxz.flowzen.cn/)　·　**国内镜像**：[gitee.com/acef09/dxz-learning](https://gitee.com/acef09/dxz-learning)　·　**离线包**：[geo-lab-offline.zip](https://gitee.com/acef09/dxz-learning/raw/main/release/geo-lab-offline.zip)
 >
 > 如果这个项目对你有帮助，欢迎在 [GitHub](https://github.com/lielie66/dxz-learning) 点一个 ⭐ Star。
 
@@ -34,11 +34,10 @@
 
 ## 在线使用
 
+- **一键打开（推荐，国内可直连）**：**https://dxz.flowzen.cn/**
 - **GitHub Pages**（海外 / 能访问 GitHub）：**https://lielie66.github.io/dxz-learning/**
-- **Gitee Pages**（国内，开通后）：**https://acef09.gitee.io/dxz-learning/**
-- 两个都打不开时：下载离线包，解压后双击 `地理实验室.html`
-
-（GitHub Pages 如果还没生效：在仓库 Settings → Pages 里把 Source 设为 `main` 分支的 `/docs` 目录。）
+- **Gitee 镜像仓库**（国内备用）：**https://gitee.com/acef09/dxz-learning**
+- 都打不开时：下载离线包，解压后双击 `地理实验室.html`
 
 ## 离线使用
 
