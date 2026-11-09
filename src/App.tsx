@@ -7,6 +7,7 @@ import ClimateChart from "./globe/ClimateChart";
 import EarthBasics from "./globe/EarthBasics";
 import MapBasics from "./globe/MapBasics";
 import ContourMap from "./globe/ContourMap";
+import ContourLab from "./globe/ContourLab";
 import Terrain3D from "./globe/Terrain3D";
 import ValleyContour from "./globe/ValleyContour";
 import SolarSystem from "./globe/SolarSystem";
@@ -75,6 +76,7 @@ type ViewMode =
   | "earth"
   | "map"
   | "contour"
+  | "contourlab"
   | "solar"
   | "hierarchy"
   | "timeline"
@@ -582,7 +584,14 @@ export default function App() {
       <main className="layout">
         <section className="stage">
           <div className={viewMode === "split" ? "stage-canvas split" : "stage-canvas"}>
-            {viewMode === "valley" ? (
+            {viewMode === "contourlab" ? (
+              <div className="pane">
+                <ContourLab
+                  key={step.contourLab?.scene ?? "mountain"}
+                  scene={step.contourLab?.scene ?? "mountain"}
+                />
+              </div>
+            ) : viewMode === "valley" ? (
               <div className="pane">
                 <ValleyContour />
               </div>
@@ -651,7 +660,7 @@ export default function App() {
             )}
           </div>
 
-          {!["terrain", "climate", "earth", "map", "contour", "solar", "hierarchy", "timeline", "terrain3d", "valley"].includes(viewMode) && (
+          {!["terrain", "climate", "earth", "map", "contour", "contourlab", "solar", "hierarchy", "timeline", "terrain3d", "valley"].includes(viewMode) && (
             <div className="view-switch">
             <button
               className={viewMode === "3d" ? "on" : ""}
@@ -704,7 +713,8 @@ export default function App() {
             </div>
           )}
 
-          <div className="stage-hint">
+          {viewMode !== "contourlab" && (
+            <div className="stage-hint">
             {viewMode === "china"
               ? "点击省份，查看简称与行政中心"
               : viewMode === "flat"
@@ -713,7 +723,9 @@ export default function App() {
                   ? "示意图：西高东低，呈三级阶梯"
                   : viewMode === "climate"
                     ? "左轴气温（℃），右轴降水（mm）"
-                    : viewMode === "solar"
+                    : viewMode === "contour"
+                      ? "示意图：A–F 五个地形部位"
+                      : viewMode === "solar"
                       ? "太阳系示意图：八大行星围绕太阳公转"
                       : viewMode === "hierarchy"
                         ? "天体系统：一层套一层"
@@ -729,7 +741,8 @@ export default function App() {
                 {fmtCoord({ lat: Math.round(hover.lat), lon: Math.round(hover.lon) })}
               </span>
             )}
-          </div>
+            </div>
+          )}
 
           {picked && (viewMode === "3d" || viewMode === "flat" || viewMode === "split") && (
             <div className="pick-card">

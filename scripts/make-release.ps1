@@ -1,4 +1,4 @@
-# 生成离线版压缩包：release/geo-lab-offline.zip
+﻿# 生成离线版压缩包：release/geo-lab-offline.zip
 # 用法：在仓库根目录执行 powershell -ExecutionPolicy Bypass -File scripts/make-release.ps1
 
 $root = Split-Path -Parent $PSScriptRoot

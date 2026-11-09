@@ -23,6 +23,7 @@ A parent built this for a 7th grader who could not understand latitude/longitude
 ## Features
 
 - **3D globe** with graticule, degree labels, click-to-read coordinates, and a sphere/flat/split comparison
+- **Contour lab**: side-by-side 3D terrain and top-down contour map, with a draggable cutting plane that shows where each contour comes from
 - **China map** with provinces, rivers, terrain steps, climate charts and contour maps
 - **20 lessons** following the textbook order (Earth in the universe → Earth and maps → China's territory and population → China's natural environment)
 - **24 question types**, procedurally generated with anti-repetition (shuffle bags + recent-signature checks)

@@ -1,5 +1,6 @@
 import type { GlobeConfig } from "./globe/Globe";
 import type { ChinaConfig } from "./globe/ChinaMap";
+import type { ContourScene } from "./globe/ContourLab";
 import {
   CHANGJIANG,
   HUANGHE,
@@ -26,6 +27,7 @@ export type LessonStep = {
     | "earth"
     | "map"
     | "contour"
+    | "contourlab"
     | "solar"
     | "hierarchy"
     | "timeline"
@@ -38,6 +40,7 @@ export type LessonStep = {
   earth?: { mode: "shape" | "zones" };
   map?: { mode: "scale" | "direction" | "legend" };
   contour?: { highlight?: "peak" | "saddle" | "cliff" | "ridge" | "valley" | null };
+  contourLab?: { scene: ContourScene };
   solar?: { highlight?: string | null };
   timeline?: { mode: "world" | "china" | "all" };
 };
@@ -754,29 +757,39 @@ const LESSON_LIST: Lesson[] = [
     subtitle: "把三维地形压成二维",
     steps: [
       {
-        title: "等高线和等高距",
-        body: "等高线是把海拔相同的点连接成的线。\n相邻两条等高线的高度差叫等高距。等高线上的数值是海拔，单位是米。",
-        bullets: ["等高线：海拔相同的点连成的线", "等高距：相邻等高线的高度差", "数值越大，海拔越高"],
-        tip: "等高线越密，坡越陡；越稀，坡越缓。",
-        view: "contour",
+        title: "等高线：把山从上往下看",
+        body: "把一座山从上往下压平，再用一层一层的水平面去切它。\n每一层和山坡的交线，投影到纸上就是一条等高线；相邻两条等高线的高度差，叫等高距。",
+        bullets: [
+          "等高线：海拔相同的点连成的线",
+          "等高距：相邻两条等高线的高度差（图中为 50 米）",
+          "一圈套一圈：越往里，海拔越高",
+        ],
+        tip: "拖动「切面高度」，看左边的红圈和右边地图上的线是不是同时变化。",
+        view: "contourlab",
         globe: {},
-        contour: { highlight: null },
+        contourLab: { scene: "mountain" },
       },
       {
-        title: "一条等高线是怎么切出来的",
-        body: "想象给山谷灌水：水面停在某一高度时，水面和山坡的交线，就是一条等高线。\n拖动下面的水位，看这条线怎么移动；点「山脊」可以切换对比。",
-        bullets: ["水位越高，等高线越靠上游", "水位越低，等高线越靠下游", "山谷：V 尖指向高处（上游）", "山脊：V 尖指向低处（下游）"],
-        tip: "先把水位从高拖到低，看红色 V 尖往哪边跑；再切到「山脊」对比一次。",
-        view: "valley",
+        title: "山脊和山谷：只看 V 尖朝哪边",
+        body: "山脊是向低处伸出的高地，像脊背；山谷是向高处凹进去的低地，像沟。\n同样高度的等高线遇到山脊，被推向低处；遇到山谷，被推向高处。",
+        bullets: [
+          "山脊：中间高、两边低，等高线凸向低处",
+          "山谷：中间低、两边高，等高线凸向高处",
+          "河流发育在山谷，水从高处流向低处",
+        ],
+        tip: "在「山脊」「山谷」之间来回切，只盯 V 尖指的方向，别记反。",
+        view: "contourlab",
         globe: {},
+        contourLab: { scene: "ridge" },
       },
       {
-        title: "转一转：山脊和山谷",
-        body: "拖动这个立体地形块，从侧面看：山脊是隆起的，山谷是凹下去的。\n等高线凸向低处的是山脊，凸向高处的是山谷。",
-        bullets: ["山脊：中间高、两边低，像脊背", "山谷：中间低、两边高，常有河流"],
-        tip: "把地形块转到侧面，看山脊的“脊”和山谷的“沟”。蓝色的是山谷里的河流。",
-        view: "terrain3d",
+        title: "陡坡、缓坡和陡崖",
+        body: "等高线的疏密，表示坡的陡缓：线越密，坡越陡；线越稀，坡越缓。\n坡面近乎直立时，不同高度的等高线会挤在一起，甚至重合，这就是陡崖。",
+        bullets: ["缓坡：等高线稀疏", "陡坡：等高线密集", "陡崖：等高线重合或极密"],
+        tip: "登山走缓坡，攀岩找陡崖；判断陡缓，看疏密比看数值更快。",
+        view: "contourlab",
         globe: {},
+        contourLab: { scene: "slope" },
       },
       {
         title: "五个部位：山顶、鞍部、陡崖、山脊、山谷",
