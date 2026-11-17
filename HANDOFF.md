@@ -1,7 +1,7 @@
 # HANDOFF · 进度交接
 
 > 更新时间：2026-11-17
-> 交接基线：`8ab5cdf`（之后以 `git log --oneline -5` 为准）
+> 交接基线：以 `git log --oneline -1` 为准（生成本文档时的提交：`73ddbac`）
 > 读者：下一个接手的 agent / 另一个 session / 另一台电脑
 
 ---
