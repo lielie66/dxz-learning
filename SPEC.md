@@ -160,3 +160,18 @@ type Question = {
 - **真题模拟**：按期末题型组卷，限时，交卷后给考点报告。
 
 排序权重 = 真题出现频率 × 孩子错误率 × 最近错误时间。
+
+## 12. 文档索引
+
+| 文件 | 用途 |
+|---|---|
+| [`AGENTS.md`](./AGENTS.md) | 所有编码代理的第一站：命令、约束、并行规则 |
+| [`HANDOFF.md`](./HANDOFF.md) | 当前进度、已知问题、待办、学科认领 |
+| [`handoff/ARCHITECTURE.md`](./handoff/ARCHITECTURE.md) | 目标 monorepo 结构、包边界、拆分步骤 |
+| [`handoff/CONTENT.md`](./handoff/CONTENT.md) | 教材版本、讲解写法、题目规范、隐私 |
+| [`handoff/DEPLOY.md`](./handoff/DEPLOY.md) | GitHub / Gitee / EdgeOne / 离线包发布 |
+| [`handoff/DECISIONS.md`](./handoff/DECISIONS.md) | 已定决策与待定问题 |
+| [`handoff/NEW_SUBJECT.md`](./handoff/NEW_SUBJECT.md) | 开历史 / 生物的 checklist 与会话开场提示 |
+
+> 当前仓库仍是地理单应用；`apps/*` 与 `packages/*` 是目标结构，尚未拆分。
+> 拆分前请遵守 `AGENTS.md` §6 的并行开发规则。
