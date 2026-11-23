@@ -2,9 +2,9 @@
 # 用法：在仓库根目录执行 powershell -ExecutionPolicy Bypass -File scripts/make-release.ps1
 
 $root = Split-Path -Parent $PSScriptRoot
-$src = Join-Path $root "docs\index.html"
+$src = Join-Path $root "docs\geo\index.html"
 if (-not (Test-Path $src)) {
-    Write-Error "找不到 docs/index.html，请先运行 npm run build"
+    Write-Error "找不到 docs/geo/index.html，请先运行 npm run build:geo"
     exit 1
 }
 

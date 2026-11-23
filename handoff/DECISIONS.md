@@ -8,12 +8,12 @@
 ## D-001 · 单仓库多学科（monorepo）
 
 - 日期：2026-11-08
-- 状态：**已定，未执行**
+- 状态：**Phase 1 已完成（2026-11-23），Phase 2 待做**
 - 背景：地理、历史、生物要共用外壳、练习引擎、错题本；分三个仓库会复制三份核心代码，用户还要记三个地址。
 - 决定：同一仓库，目标结构 `apps/geo|history|biology` + `packages/core` + `packages/content`。
 - 后果：
-  - 需要一次目录搬迁和 core 抽取（见 `handoff/ARCHITECTURE.md`）
-  - 拆分完成前，仓库根仍是地理单应用
+  - Phase 1 已完成：`apps/geo` + 根 workspaces + `docs/geo/`
+  - Phase 2 待做：外壳 / 页签 / 练习卡抽到 `packages/core`
   - 并行开发必须遵守 `AGENTS.md` 的“一个学科一个 owner”
 
 ---

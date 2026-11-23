@@ -6,19 +6,24 @@
 
 ## 0. 前置条件
 
-- [ ] monorepo 已拆分（`apps/geo` + `packages/core`），或用户明确同意“先在独立分支做内容准备，不合并”
+- [x] monorepo Phase 1 已完成（`apps/geo` + `packages/core` + `packages/content`）
+- [ ] Phase 2（外壳 / 页签 / 练习卡抽到 core）完成——**推荐等**；没完成时先做内容草稿
 - [ ] 教材版本、版次、学校进度、考试范围已确认（见 `handoff/CONTENT.md` §1）
 - [ ] 在 `HANDOFF.md` §7 学科认领表登记：学科 / session / 分支
 - [ ] 已读 `AGENTS.md`、`SPEC.md`、`HANDOFF.md`、`handoff/ARCHITECTURE.md`、`handoff/CONTENT.md`
 
 ---
 
-## 1. 建 app（拆分后）
+## 1. 建 app
+
+**Phase 2 完成前，不要 `cp -r apps/geo apps/history`。**
+现在先做内容草稿（章节、讲解、题目、scene 草图），不要复制地理外壳。
+
+Phase 2 完成后，再从 core 外壳建 app：
 
 ```powershell
-# 以 geo 为模板，不要复制 core
+# Phase 2 之后
 cp -r apps/geo apps/history
-# 或使用脚手架脚本（待补）
 ```
 
 然后：
@@ -111,7 +116,7 @@ export const manifest: SubjectManifest = {
 ## 6. 错题本
 
 - [ ] 使用 `dxz:history:wrongbook:v1` 命名空间
-- [ ] 复用 `packages/core` 的 `useWrongBook`
+- [ ] 复用 `packages/core` 的 `createWrongBook()`
 - [ ] 不要复用 `geo-lab:wrongbook:v1`
 - [ ] 验证：答错 → 进错题本 → 1/3/7/15 天排期
 
@@ -120,8 +125,8 @@ export const manifest: SubjectManifest = {
 ## 7. 构建与上线
 
 - [ ] `npm run build:history` 产出 `docs/history/index.html`
-- [ ] `docs/index.html` 落地页加上历史入口（状态从“开发中”改为“已上线”）
-- [ ] 本地 `npx serve docs` 验证 `/history/`
+- [ ] `site/index.html` 落地页加上历史入口（状态从“开发中”改为“已上线”）
+- [ ] 本地 `npx vite preview --outDir docs` 验证 `/history/`
 - [ ] 按 `handoff/DEPLOY.md` 部署 EdgeOne
 - [ ] GitHub / Gitee 推送
 - [ ] 线上验证：`https://dxz.flowzen.cn/history/`

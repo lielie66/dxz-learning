@@ -1,62 +1,50 @@
 # 架构与拆分方案
 
-> 目标：同一仓库容纳地理 / 历史 / 生物，共用一套外壳、练习引擎、错题本和设计系统；
+> 目标：同一仓库容纳地理 / 历史 / 生物，共用外壳、练习引擎、错题本和设计系统；
 > 每个学科仍然产出**一个可双击的 HTML**。
 
 ---
 
-## 1. 现状 vs 目标
+## 1. 现状（2026-11-23）
 
-### 现状（2026-11-17）
-
-```text
-dxz-learning/                ← 仓库根就是地理应用
-├── src/
-│   ├── App.tsx              外壳 + 页面布局 + 视图切换
-│   ├── lessons.ts           地理 20 课
-│   ├── lib/quiz.ts          地理 24 类题
-│   ├── lib/wrongbook.ts     错题本
-│   ├── globe/*              地理场景
-│   └── styles.css
-├── docs/index.html          构建产物
-├── release/geo-lab-offline.zip
-└── scripts/
-```
-
-问题：
-
-- 历史 / 生物没有地方放；硬塞进 `src/` 会让单文件越来越大，且多个 agent 改同一批文件。
-- `App.tsx` 同时承担“外壳”和“地理特有逻辑”，无法直接复用。
-- 没有构建多个入口的能力。
-
-### 目标
+**monorepo Phase 1 已完成：**
 
 ```text
 dxz-learning/
-├── apps/
-│   ├── geo/                 地理（现有代码迁入）
-│   │   ├── src/
-│   │   │   ├── lessons.ts
-│   │   │   ├── quiz/
-│   │   │   ├── scenes/
-│   │   │   └── manifest.ts
-│   │   ├── index.html
-│   │   ├── vite.config.ts
-│   │   └── package.json
-│   ├── history/
-│   └── biology/
-├── packages/
-│   ├── core/                外壳、页签、讲解卡、练习卡、错题本、存储、设计变量
-│   └── content/             schema、类型、校验脚本
-├── site/                    落地页源（静态 HTML）
-├── docs/                    GitHub Pages 产物：/、/geo/、/history/、/biology/
-├── content-private/         试卷、孩子错题（gitignore）
+├── apps/geo/                 @dxz/geo
+│   ├── index.html
+│   ├── src/
+│   ├── vite.config.ts
+│   └── package.json
+├── packages/core/            @dxz/core
+│   └── src/{types,storage,wrongbook,index}.ts
+├── packages/content/         @dxz/content
+│   └── src/{types,validate,index}.ts
+├── site/index.html           落地页源
+├── docs/
+│   ├── index.html            落地页（生成）
+│   └── geo/index.html        地理（生成）
 ├── scripts/
-├── AGENTS.md
-├── SPEC.md
-├── HANDOFF.md
+├── handoff/
+├── AGENTS.md / CLAUDE.md
+├── SPEC.md / HANDOFF.md
 └── package.json             workspaces 根
 ```
+
+已经抽到 core 的：
+
+- `WrongItem` / `WrongInput` / `WrongStats`
+- `createWrongBook()`（按学科传入 `storageKey`，支持旧键迁移）
+- `readJSON` / `writeJSON` / `readMigratedJSON`
+
+**尚未抽取（Phase 2）：**
+
+- `AppShell`、顶栏、左右布局
+- 页签、讲解卡、练习卡、错题本 UI
+- 通用洗牌袋 / 最近签名去重
+- 设计变量与基础 CSS
+
+因此：历史和生物现在**可以写内容、做 scene**，但**不要复制 `apps/geo` 的外壳**，等 Phase 2。
 
 ---
 
@@ -66,22 +54,22 @@ dxz-learning/
 
 只放**与学科无关**的东西：
 
-- `AppShell`：顶栏、左右布局、响应式
-- `Tabs`：讲解 / 练习 / 错题本
-- `StepCard`、`QuizCard`、`WrongBookView`、`StatsBar`
-- `useWrongBook`、`storage`（localStorage 适配、命名空间、导入导出）
-- `design tokens` / 基础 CSS
-- `SceneRegistry` 类型：学科注册自己的 scene 组件
-- `SubjectManifest` 类型
+- `AppShell`：顶栏、左右布局、响应式（Phase 2）
+- `Tabs`：讲解 / 练习 / 错题本（Phase 2）
+- `StepCard`、`QuizCard`、`WrongBookView`、`StatsBar`（Phase 2）
+- `useWrongBook`、`createWrongBook`、`storage`（已完成）
+- 通用洗牌袋 / 去重（Phase 2）
+- `design tokens` / 基础 CSS（Phase 2）
+- `SceneRegistry` 类型（Phase 2）
+- `SubjectManifest` 类型（已放 `@dxz/content`）
 
-**不要**放：地理的经纬网、历史的时间轴、生物的细胞图。这些属于各学科。
+**不要**放：地理的经纬网、历史的时间轴、生物的细胞图。
 
 ### `packages/content`
 
-- `LessonStep` / `Question` / `SubjectManifest` 类型
-- `validateContent()`：答案在选项内、选项不重复、解析非空、scene 参数合法
-- 教材版本、章节、考点的通用结构
-- 不存放任何一科的具体内容
+- `SubjectManifest` / `Chapter` / `LessonStepBase` / `QuestionBase` / `SceneSpec`（已完成）
+- `validateQuestion()` / `validateLessonSteps()`（基础版已完成）
+- 后续：教材版本、章节、考点的通用结构；不存放任何一科的具体内容
 
 ### `apps/<subject>`
 
@@ -91,15 +79,13 @@ dxz-learning/
 - `scenes/`：该学科可视化组件
 - `styles.css`：只放该学科特有的样式
 
-**禁止** `apps/history`  import `apps/geo`。
+**禁止** `apps/history` import `apps/geo`。
 
 ---
 
 ## 3. 构建与部署
 
 ### 每个学科一个单文件
-
-每个 app 继续用 `vite-plugin-singlefile`，产物：
 
 ```text
 apps/geo/dist/index.html       → docs/geo/index.html
@@ -108,9 +94,9 @@ apps/biology/dist/index.html   → docs/biology/index.html
 site/index.html                → docs/index.html
 ```
 
-`docs/` 仍是 GitHub Pages 的发布目录，也是 EdgeOne 上传的根。
+`docs/` 是 GitHub Pages 的发布目录，也是 EdgeOne 上传的根。
 
-### 根 `package.json`（示例）
+### 根 `package.json`（当前）
 
 ```json
 {
@@ -119,85 +105,76 @@ site/index.html                → docs/index.html
   "scripts": {
     "dev:geo": "npm run dev -w @dxz/geo",
     "build:geo": "npm run build -w @dxz/geo && node scripts/copy-docs.mjs geo",
-    "build:history": "npm run build -w @dxz/history && node scripts/copy-docs.mjs history",
-    "build:biology": "npm run build -w @dxz/biology && node scripts/copy-docs.mjs biology",
     "build:site": "node scripts/build-site.mjs",
-    "build": "npm run build:geo && npm run build:history && npm run build:biology && npm run build:site",
+    "build": "npm run build:geo && npm run build:site",
+    "preview:geo": "npm run preview -w @dxz/geo",
     "lint": "oxlint",
-    "validate": "node scripts/validate-content.mjs"
+    "release:geo": "powershell -ExecutionPolicy Bypass -File scripts/make-release.ps1"
   }
 }
 ```
 
-`scripts/copy-docs.mjs` 改成接受学科参数，复制到 `docs/<subject>/index.html`。
+新增学科时加：
+
+```json
+"dev:history": "npm run dev -w @dxz/history",
+"build:history": "npm run build -w @dxz/history && node scripts/copy-docs.mjs history"
+```
 
 ### 路由
 
-- `/` → 落地页（三个学科卡片 + 离线包链接）
-- `/geo/` → 地理单文件
-- `/history/` → 历史单文件
-- `/biology/` → 生物单文件
+- `/` → 落地页
+- `/geo/` → 地理
+- `/history/` → 历史
+- `/biology/` → 生物
 
-每个单文件内部**不需要 router**；学科内导航仍由右侧课程按钮完成。
+每个单文件内部不需要 router。
 
 ### EdgeOne 上传
 
-EdgeOne Makers 的“直接上传”不接受多个单独文件，只接受单个 HTML / ZIP / 文件夹。
-拆分后建议：
+控制台“直接上传”只接受单个 HTML / ZIP / 文件夹，不接受多个单独文件。
+拆分后：
 
-1. 本地 `npm run build`
-2. 把 `docs/` 打成 `site-deploy.zip`（根含 `index.html`、`geo/`、`history/`、`biology/`）
+1. `npm run build`
+2. 把 `docs/` 打成 ZIP（根含 `index.html`、`geo/`、`history/`、`biology/`）
 3. 控制台上传 ZIP
-4. 验证 `/`、`/geo/`、`/history/`、`/biology/`
+4. 验证 `/`、`/geo/`
 
-注意：根目录放 `.zip` 当下载文件实测返回 404，离线包仍走 GitHub Release / Gitee raw。
+根目录放 `.zip` 当下载文件实测 404；离线包仍走 GitHub Release / Gitee raw。
 
 ---
 
-## 4. 拆分步骤（建议按顺序做）
+## 4. Phase 2：抽 core 的步骤
 
-### Phase 0 · 冻结与基线
+### Step 1 · 抽 UI 外壳
 
-- [ ] `git checkout -b refactor/monorepo`
-- [ ] 打 tag：`geo-v0.9-pre-monorepo`
-- [ ] 记录当前线上产物 hash / 文件大小，拆分后逐项对比
-- [ ] 确认 `npm run build`、`npm run preview` 基线通过
+- [ ] `AppShell`：顶栏、左右布局、响应式
+- [ ] `Tabs`：讲解 / 练习 / 错题本
+- [ ] `StepCard`：标题、正文、bullets、tip、步骤计数
+- [ ] `QuizCard`：题干、选项、反馈、下一题
+- [ ] `WrongBookView`：统计、列表、复习入口
+- [ ] 把 `apps/geo/src/styles.css` 拆成 `core/base.css` + `apps/geo/geo.css`
 
-### Phase 1 · 目录搬迁（先不改逻辑）
+### Step 2 · 抽练习引擎
 
-- [ ] 根 `package.json` 改为 workspaces 根
-- [ ] 新建 `apps/geo/`，把 `index.html`、`src/`、`vite.config.ts`、`tsconfig*`、`package.json` 迁入
-- [ ] 根保留 `scripts/`、`docs/`、`release/`、`assets/`、`SPEC.md` 等
-- [ ] 修正 `scripts/copy-docs.mjs`、`make-release.ps1` 的路径
-- [ ] `npm install` 重新生成 lockfile
-- [ ] `npm run build:geo` 产出 `docs/geo/index.html`
-- [ ] 临时保留 `docs/index.html` 为地理，确保线上不中断
-- [ ] 全量回归：20 课、24 类题、错题本、离线包
+- [ ] 洗牌袋（shuffle bag）
+- [ ] 最近 N 题签名去重
+- [ ] 题目工厂注册表：学科传入 `makeQuestion(kind)`
+- [ ] `QuestionBase` 扩展：地理的 visual / geo4Visual 放回 geo
 
-> 这一阶段的目标是“行为完全不变”，只改路径。不要顺手重构。
+### Step 3 · 地理改为纯配置
 
-### Phase 2 · 抽 core
+- [ ] `apps/geo/src/App.tsx` 只保留地理的 lessons / quiz / scenes / 视图分支
+- [ ] 外壳从 `@dxz/core` 引入
+- [ ] 行为与样式完全不变
 
-按依赖从少到多抽：
+### Step 4 · 历史 / 生物脚手架
 
-1. `storage` + `useWrongBook`（最独立）
-2. `AppShell` / `Tabs` / `StepCard` / `QuizCard` / `WrongBookView`
-3. `styles.css` 拆成 `core/base.css` + `apps/geo/geo.css`
-4. `SceneRegistry` 类型
+按 `handoff/NEW_SUBJECT.md`：
 
-每抽一块，地理必须仍能构建、页面不变。
-
-### Phase 3 · 落地页 + 多入口构建
-
-- [ ] `site/index.html`：三个学科卡片，显示“已上线 / 开发中”
-- [ ] `scripts/build-site.mjs` 复制到 `docs/index.html`
-- [ ] `docs/geo/index.html` 可访问
-- [ ] 根路径 `/` 不再直接是地理
-
-### Phase 4 · 历史 / 生物
-
-按 `handoff/NEW_SUBJECT.md` 执行。
-新学科只新增 `apps/<subject>`，不改 `apps/geo`。
+- [ ] `apps/<subject>` 从 core 引入外壳
+- [ ] 只写 manifest / lessons / quiz / scenes
+- [ ] 构建到 `docs/<subject>/index.html`
 
 ---
 
@@ -205,15 +182,17 @@ EdgeOne Makers 的“直接上传”不接受多个单独文件，只接受单�
 
 ### localStorage 命名空间
 
-现状：`geo-lab:wrongbook:v1`
+现状：
 
-目标：`dxz:<subject>:wrongbook:v1`
+- 地理：`dxz:geo:wrongbook:v1`
+- 旧键：`geo-lab:wrongbook:v1`（自动迁移，保留一版）
 
-迁移策略：
+目标：
 
-- 读取时先读新键；没有则读旧键 `geo-lab:wrongbook:v1`，迁移到 `dxz:geo:wrongbook:v1`
-- 迁移后保留旧键一个版本，避免回滚丢数据
-- 历史 / 生物从一开始就用新键
+- 历史：`dxz:history:wrongbook:v1`
+- 生物：`dxz:biology:wrongbook:v1`
+
+迁移策略：`readMigratedJSON(newKey, legacyKey, fallback)`，先读新键，没有再读旧键并写入新键。
 
 ### 内容版本
 
@@ -233,7 +212,7 @@ EdgeOne Makers 的“直接上传”不接受多个单独文件，只接受单�
 ### 方案 C：每个学科一个独立仓库
 
 - 优点：完全隔离
-- 缺点：外壳、错题本、设计系统要复制三份；用户要记三个地址；与“同一个仓库”的目标冲突
+- 缺点：外壳、错题本、设计系统要复制三份；用户要记三个地址
 - 结论：不采用
 
 ---
@@ -242,9 +221,9 @@ EdgeOne Makers 的“直接上传”不接受多个单独文件，只接受单�
 
 | 风险 | 对策 |
 |---|---|
-| 搬迁后路径/构建坏了 | Phase 1 只改路径，不改逻辑；逐项对比产物 |
-| core 抽得太早，接口不稳定 | 先复制后抽象：Phase 1 完成、行为稳定后再抽 |
-| 单文件体积继续涨 | 每科独立单文件；core 只放必要代码；定期看 gzip 大小 |
-| 多 agent 改 core 冲突 | core 改动先在 `handoff/DECISIONS.md` 登记；一个时间只允许一个 core owner |
-| EdgeOne 上传目录结构不对 | 本地 `docs/` 结构与线上一致；上传前用 `python -m http.server` 验证 `/geo/` 等路径 |
+| Phase 2 抽外壳改坏地理 | 先写快照/手动回归清单；每抽一块跑 `npm run build` + `/geo/` 全课 |
+| core 接口不稳定 | 先在 geo 内部用，稳定后再让历史/生物接 |
+| 单文件体积继续涨 | 每科独立单文件；core 只放必要代码；定期看 gzip |
+| 多 agent 改 core 冲突 | core 改动先在 `handoff/DECISIONS.md` 登记；一个时间一个 core owner |
+| EdgeOne 目录结构不对 | 本地 `npx vite preview --outDir docs` 验证 `/` 和 `/geo/` 后再上传 |
 | GitHub Pages 的 `/geo/` 404 | 确认 `docs/geo/index.html` 已提交，Pages source 仍是 `/docs` |

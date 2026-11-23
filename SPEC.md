@@ -18,25 +18,28 @@
 - 先跑通，再精修：每个学科先保证「讲解能看懂、题目能练、错题能复习」，再补细节。
 - 按期末权重和孩子薄弱点排序，允许某些小节只做“了解”级别。
 
-## 3. 仓库结构（目标）
+## 3. 仓库结构（Phase 1 已完成）
 
-单仓库、多入口。历史开工前落地：
+单仓库、多入口。Phase 1 已落地 `apps/geo` + `packages/core` + `packages/content`；
+历史 / 生物目录待建。
 
 ```
 dxz-learning/
 ├── apps/
-│   ├── geo/                地理入口（现有代码迁入）
-│   ├── history/            历史入口
-│   └── biology/            生物入口
+│   ├── geo/                地理入口（已迁入）
+│   ├── history/            历史入口（待建）
+│   └── biology/            生物入口（待建）
 ├── packages/
-│   ├── core/               壳、练习引擎、错题本、存储、设计系统
+│   ├── core/               类型、存储、错题本（外壳/练习引擎待抽）
 │   └── content/            内容 schema 与校验脚本
+├── site/                   学科落地页源
 ├── content-private/        学校试卷、孩子错题（不进公开仓库）
-├── docs/                   GitHub Pages 产物：/geo/ /history/ /biology/ + 落地页
+├── docs/                   发布产物：/geo/ /history/ /biology/ + 落地页
 └── SPEC.md
 ```
 
-在拆分完成前，允许 `geo-lab` 维持单应用结构，但新代码要按 `core` / `subjects` 的边界放。
+Phase 2（把外壳、页签、练习卡抽到 `packages/core`）尚未完成。
+在那之前，历史 / 生物先做内容与 scene，不要复制 `apps/geo` 的外壳。
 
 ## 4. 内容模型
 

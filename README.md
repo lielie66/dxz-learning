@@ -4,7 +4,7 @@
 
 不需要后端、不需要联网。构建产物是一个可以直接双击打开的 HTML 文件。
 
-> **一键打开**：[dxz.flowzen.cn](https://dxz.flowzen.cn/)　·　**国内镜像**：[gitee.com/acef09/dxz-learning](https://gitee.com/acef09/dxz-learning)　·　**离线包**：[geo-lab-offline.zip](https://gitee.com/acef09/dxz-learning/raw/main/release/geo-lab-offline.zip)
+> **学科入口**：[dxz.flowzen.cn](https://dxz.flowzen.cn/)　·　**国内镜像**：[gitee.com/acef09/dxz-learning](https://gitee.com/acef09/dxz-learning)　·　**离线包**：[geo-lab-offline.zip](https://gitee.com/acef09/dxz-learning/raw/main/release/geo-lab-offline.zip)
 >
 > 如果这个项目对你有帮助，欢迎在 [GitHub](https://github.com/lielie66/dxz-learning) 点一个 ⭐ Star。
 
@@ -34,14 +34,15 @@
 
 ## 在线使用
 
-- **一键打开（推荐，国内可直连）**：**https://dxz.flowzen.cn/**
-- **GitHub Pages**（海外 / 能访问 GitHub）：**https://lielie66.github.io/dxz-learning/**
+- **学科入口（推荐，国内可直连）**：**https://dxz.flowzen.cn/**
+- **地理直达**：**https://dxz.flowzen.cn/geo/**
+- **GitHub Pages**（海外 / 能访问 GitHub）：**https://lielie66.github.io/dxz-learning/geo/**
 - **Gitee 镜像仓库**（国内备用）：**https://gitee.com/acef09/dxz-learning**
 - 都打不开时：下载离线包，解压后双击 `地理实验室.html`
 
 ## 离线使用
 
-1. 下载仓库里的 `docs/index.html`，或直接下载 [geo-lab-offline.zip](https://gitee.com/acef09/dxz-learning/raw/main/release/geo-lab-offline.zip)
+1. 下载仓库里的 `docs/geo/index.html`，或直接下载 [geo-lab-offline.zip](https://gitee.com/acef09/dxz-learning/raw/main/release/geo-lab-offline.zip)
 2. 解压后双击 `地理实验室.html`（推荐 Chrome / Edge）
 3. 无需安装、无需联网
 
@@ -93,33 +94,43 @@
 
 ```bash
 npm install
-npm run dev      # 开发服务器
-npm run build    # 打包成单文件，并同步到 docs/index.html
+npm run dev:geo   # 地理开发服务器
+npm run build     # 地理 → docs/geo/，落地页 → docs/
 ```
 
 技术栈：Vite + React + TypeScript + Three.js。
 
 ```
-src/
-  App.tsx              界面、讲解/练习/错题本、视图切换
-  lessons.ts           10 节课的文案与每一步的地图状态
-  data/
-    china.ts           34 个省级行政区的简称、行政中心
-    china.json         省级行政区边界
-  globe/
-    Globe.tsx          Three.js 地球、经纬网、度数标签
-    FlatMap.tsx        平面世界地图
-    ChinaMap.tsx       中国地图
-    texture.ts         用矢量陆地数据生成地球贴图
-  lib/
-    coords.ts          经纬度、半球、纬度带、对称点、方向、球面距离
-    quiz.ts            24 类题目的生成器与去重
-    wrongbook.ts       错题本存储与复习排期
+apps/geo/
+  src/
+    App.tsx            界面、讲解/练习/错题本、视图切换
+    lessons.ts         20 节课的文案与每一步的地图状态
+    data/
+      china.ts         34 个省级行政区的简称、行政中心
+      china.json       省级行政区边界
+    globe/
+      Globe.tsx        Three.js 地球、经纬网、度数标签
+      FlatMap.tsx      平面世界地图
+      ChinaMap.tsx     中国地图
+      ContourLab.tsx   等高线实验室
+      texture.ts       用矢量陆地数据生成地球贴图
+    lib/
+      coords.ts        经纬度、半球、纬度带、对称点、方向、球面距离
+      quiz.ts          24 类题目的生成器与去重
+      wrongbook.ts     薄包装：调用 @dxz/core 的错题本引擎
+
+packages/
+  core/                通用类型、存储、错题本引擎
+  content/             学科 manifest / lesson / question schema 与校验
+
+site/index.html        学科落地页
+docs/                  构建产物（index.html + geo/index.html）
 ```
 
-- 改讲解文案：`src/lessons.ts`
-- 加题型：`src/lib/quiz.ts` 里加 `makeXxx()`，注册到 `MAKERS` 和 `GEO_KINDS` / `CHINA_KINDS`
-- 改配色字号：`src/styles.css`
+- 改讲解文案：`apps/geo/src/lessons.ts`
+- 加题型：`apps/geo/src/lib/quiz.ts` 里加 `makeXxx()`，注册到 `MAKERS` 和 `GEO_KINDS` / `CHINA_KINDS`
+- 改配色字号：`apps/geo/src/styles.css`
+- 改错题本逻辑：`packages/core/src/wrongbook.ts`（注意兼容旧键）
 
 ## 数据与版权
 

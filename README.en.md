@@ -10,10 +10,11 @@ No backend, no account, no network required. The production build is a **single 
 
 ## Links
 
-- **Live demo (China-friendly)**: https://dxz.flowzen.cn/
+- **Live demo (China-friendly)**: https://dxz.flowzen.cn/geo/
+- **Subject landing page**: https://dxz.flowzen.cn/
 - **GitHub**: https://github.com/lielie66/dxz-learning
 - **Gitee mirror (China)**: https://gitee.com/acef09/dxz-learning
-- **GitHub Pages mirror**: https://lielie66.github.io/dxz-learning/
+- **GitHub Pages mirror**: https://lielie66.github.io/dxz-learning/geo/
 - **Offline zip**: https://gitee.com/acef09/dxz-learning/raw/main/release/geo-lab-offline.zip
 
 ## Why
@@ -43,11 +44,11 @@ A parent built this for a 7th grader who could not understand latitude/longitude
 
 ```bash
 npm install
-npm run dev      # dev server
-npm run build    # builds dist/index.html and copies it to docs/
+npm run dev:geo     # geography dev server
+npm run build       # builds apps/geo → docs/geo/ and the landing page → docs/
 ```
 
-Open `docs/index.html` directly, or serve `docs/` with any static server.
+Serve `docs/` with any static server, or open `docs/geo/index.html` directly.
 
 ## Data & license
 

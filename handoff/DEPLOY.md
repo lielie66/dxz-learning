@@ -1,6 +1,6 @@
 # 部署与发布 Runbook
 
-> 适用于当前单应用结构，以及拆分后的 `docs/<subject>/` 结构。
+> 适用于当前 monorepo：`apps/<subject>` + `docs/<subject>/`。
 > 所有命令在仓库根目录执行。**不要把密码、token、私钥写进仓库或命令历史。**
 
 ---
@@ -27,16 +27,23 @@ npm run build
 
 产物：
 
-- `dist/index.html`（本地）
-- `docs/index.html`（自动复制，**需要提交**）
+- `apps/geo/dist/index.html`（本地）
+- `docs/geo/index.html`（生成，**需要提交**）
+- `docs/index.html`（落地页，生成，**需要提交**）
 
-拆分后：
+当前可用：
 
 ```powershell
+npm run build          # build:geo + build:site
 npm run build:geo
+npm run build:site
+```
+
+新增学科后：
+
+```powershell
 npm run build:history
 npm run build:biology
-npm run build:site
 ```
 
 产物在 `docs/` 下，保持与线上路径一致。
@@ -103,7 +110,7 @@ git push https://acef09:<TOKEN>@gitee.com/acef09/dxz-learning.git main
 ```powershell
 git ls-remote https://gitee.com/acef09/dxz-learning.git refs/heads/main
 
-curl.exe -L "https://gitee.com/acef09/dxz-learning/raw/main/docs/index.html" -o "$env:TEMP\gitee_index.html"
+curl.exe -L "https://gitee.com/acef09/dxz-learning/raw/main/docs/geo/index.html" -o "$env:TEMP\gitee_index.html"
 (Get-Item "$env:TEMP\gitee_index.html").Length
 
 curl.exe -L "https://gitee.com/acef09/dxz-learning/raw/main/release/geo-lab-offline.zip" -o "$env:TEMP\gitee.zip"
@@ -125,16 +132,20 @@ curl.exe -L "https://gitee.com/acef09/dxz-learning/raw/main/release/geo-lab-offl
 
 ### 发布步骤
 
-1. 本地 `npm run build`，确认 `docs/index.html` 已更新。
-2. 控制台 → 项目 → **Build & Deploy → New Deployment**，或直接打开：
+1. 本地 `npm run build`，确认 `docs/index.html` 和 `docs/geo/index.html` 都已更新。
+2. 把 `docs/` 打成 ZIP（根含 `index.html`、`geo/`）：
+   ```powershell
+   Compress-Archive -Path (Get-ChildItem docs -Force).FullName -DestinationPath "$env:TEMP\dxz-site.zip" -Force
+   ```
+3. 控制台 → 项目 → **Build & Deploy → New Deployment**，或直接打开：
    `https://console.tencentcloud.com/edgeone/makers/upload/makers-dlyjvw6e9jvt`
-3. 选择 **Select file**，上传 `docs/index.html`。
-   - 也支持 ZIP / 文件夹；**不支持多个单独文件**。
+4. 选择 **Select file**，上传 `dxz-site.zip`。
+   - 也支持单个 HTML / 文件夹；**不支持多个单独文件**。
    - 单文件上限 25 MB。
-4. 点 **开始部署**，等状态变成“完成”。
-5. 访问 `https://dxz.flowzen.cn/?v=<日期>` 绕过缓存验证。
+5. 点 **开始部署**，等状态变成“完成”。
+6. 访问 `https://dxz.flowzen.cn/?v=<日期>` 和 `https://dxz.flowzen.cn/geo/` 验证。
 
-拆分后上传的是 `docs/` 打成的 ZIP，根含 `index.html`、`geo/`、`history/`、`biology/`。
+新增历史 / 生物后，ZIP 根里会多出 `history/`、`biology/`。
 
 ### 域名 / HTTPS
 
@@ -164,7 +175,7 @@ $cert.Subject; $cert.Issuer; $cert.NotAfter
 
 ### 回滚
 
-控制台重新上传上一版 `docs/index.html` 即可。
+控制台重新上传上一版 `dxz-site.zip` 即可。
 保留最近两版的构建产物（本地或 release/），不要只留最新一份。
 
 ---
@@ -174,7 +185,7 @@ $cert.Subject; $cert.Issuer; $cert.NotAfter
 ### 生成
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File scripts/make-release.ps1
+npm run release:geo
 ```
 
 产物：`release/geo-lab-offline.zip`（约 405–415 KB）
@@ -201,19 +212,20 @@ gh release view v0.1.0 --json assets --jq ".assets[] | {name, size, updatedAt}"
 
 - EdgeOne 站点根目录放 `.zip` 实测返回 404，**不要把离线包当站点静态文件**。
 - 离线包链接优先用 GitHub Release；国内用 Gitee raw。
-- 每次重新生成后，检查 zip 内 HTML 大小与 `docs/index.html` 一致。
+- 每次重新生成后，检查 zip 内 HTML 大小与 `docs/geo/index.html` 一致。
 
 ---
 
 ## 7. 发布后检查清单
 
-- [ ] `https://dxz.flowzen.cn/` 200，标题「地理实验室」
+- [ ] `https://dxz.flowzen.cn/` 200，标题「带孝子爱学习」
+- [ ] `https://dxz.flowzen.cn/geo/` 200，标题「地理实验室 · 七年级地理」
 - [ ] `?v=<日期>` 能看到最新改动
 - [ ] 证书 `CN=dxz.flowzen.cn`，未过期
 - [ ] HTTP 自动跳 HTTPS
 - [ ] 手机 360px 宽不横向溢出
 - [ ] 第 1 课、第 11 课、练习、错题本各走一遍
-- [ ] GitHub / Gitee 的 `docs/index.html` 与线上大小一致
+- [ ] GitHub / Gitee 的 `docs/geo/index.html` 与线上大小一致
 - [ ] 离线包能解压、双击打开
 - [ ] `README.md` 的链接可点开
 
