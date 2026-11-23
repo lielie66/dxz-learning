@@ -127,8 +127,6 @@ npm run release:geo
 | `npm run validate` 不存在 | SPEC 提到但未实现 | P2，用 `@dxz/content` 补 |
 | 无自动化测试 | 改 quiz/错题本风险高 | P2 |
 | `ValleyContour` / `Terrain3D` 已不被课程引用 | 死代码，仍进打包 | 确认后删除 |
-| Phase 2b 未做 | 历史/生物还没有通用会话层 | 先做内容；2b 抽 session hook |
-| `ui.css` 仍含地理场景样式 | 历史/生物会带入未用 CSS | 后续拆 core base + 学科样式 |
 | EdgeOne 根目录 `.zip` 404 | 离线包不能当站点静态文件 | 继续放 Release / Gitee raw |
 
 ---
