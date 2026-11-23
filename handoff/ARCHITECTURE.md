@@ -39,16 +39,19 @@ dxz-learning/
 - 外壳 UI：`AppShell` / `Tabs` / `LessonChips` / `LessonHead` / `StepCard` / `StepNav`
 - 练习 UI：`StartScreen` / `QuizHeader` / `Feedback` / `ChoiceQuestion`
 - 错题本 UI：`WrongBookPanel`
-- 基础 CSS：`packages/core/src/ui.css`（暂含地理场景样式）
+- 基础 CSS：`packages/core/src/ui.css`
+- 练习会话：`useQuizSession`
+- 错题本状态：`useWrongBook`
+- 随机工具：`shuffle` / `createShuffleBag` / `createRecentTracker`
+- 地理场景样式：`apps/geo/src/geo.css`
 
-**尚未抽取（Phase 2b）：**
+**尚未抽取（Phase 3 可选）：**
 
-- 通用练习会话状态机（tabs、练习历史、错题复习流程）
-- 通用洗牌袋 / 最近签名去重
-- CSS 拆成 core base + 各学科样式
-- 地理 App 仍保留状态与场景切换逻辑
+- 通用题目类型扩展（地理的 visual / geo4Visual 仍在 `apps/geo`）
+- 各学科 scene registry 类型
+- 更细的 CSS 主题 / 设计变量
 
-因此：历史和生物现在**可以复用 UI 组件**，但完整 app 的会话层还要等 2b；先写内容与 scene。
+因此：历史/生物**可以开始搭 app**，复用 core 的外壳、练习会话、错题本和随机工具；只写自己的 manifest / lessons / quiz / scenes。
 
 ---
 
@@ -157,23 +160,26 @@ site/index.html                → docs/index.html
 - [x] `StepCard`：标题、正文、bullets、tip、步骤计数
 - [x] `ChoiceQuestion`：选项、反馈、蒙对加错题、下一题
 - [x] `WrongBookPanel`：统计、列表、复习入口
-- [~] 外壳 CSS 已移到 `packages/core/src/ui.css`，但还含地理场景样式，待拆成 core base + `apps/geo/geo.css`
+- [x] 外壳 CSS 拆成 `packages/core/src/ui.css` + `apps/geo/src/geo.css`
 
-### Step 2 · 抽练习会话层（Phase 2b，待做）
+### Step 2 · 抽练习会话层（Phase 2b 已完成）
 
-- [ ] 洗牌袋（shuffle bag）
-- [ ] 最近 N 题签名去重
-- [ ] 题目工厂注册表：学科传入 `makeQuestion(kind)`
-- [ ] `useSubjectSession`：tabs / 练习历史 / 错题复习流程
-- [ ] `QuestionBase` 扩展：地理的 visual / geo4Visual 放回 geo
+- [x] 洗牌袋（shuffle bag）
+- [x] 最近 N 题签名去重
+- [x] 题目工厂注册表：学科传入 `makeQuestion(kind)`
+- [x] `useQuizSession`：练习历史 / 选择 / 下一题 / 错题重练流程
+- [x] `useWrongBook`：错题本状态 + 旧键迁移
+- [ ] `QuestionBase` 扩展：地理的 visual / geo4Visual 放回 geo（Phase 3 可选）
 
-### Step 3 · 地理改为纯配置（部分完成）
+### Step 3 · 地理改为纯配置（基本完成）
 
 - [x] 外壳从 `@dxz/core` 引入（`AppShell` / `Tabs` / 讲解 / 练习 / 错题本）
-- [ ] `apps/geo/src/App.tsx` 只保留地理的 lessons / quiz / scenes / 视图分支
-- [ ] 行为与样式完全不变
+- [x] 练习会话从 `useQuizSession` 引入
+- [x] 错题本从 `useWrongBook` 引入
+- [~] `apps/geo/src/App.tsx` 仍保留地理 scene 配置与 click 模式（学科职责）
+- [x] 行为与样式回归通过
 
-### Step 4 · 历史 / 生物脚手架（待 2b）
+### Step 4 · 历史 / 生物脚手架（可以开始）
 
 按 `handoff/NEW_SUBJECT.md`：
 

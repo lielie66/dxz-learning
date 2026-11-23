@@ -9,10 +9,10 @@
 ## 0. 一页结论
 
 - **monorepo Phase 1 已完成**：地理迁入 `apps/geo`，根目录是 npm workspaces。
-- **Phase 2a 已完成**：`@dxz/core` 抽出外壳 UI（`AppShell` / `Tabs` / 讲解卡 / 练习卡 / 错题本卡）、类型、存储、错题本引擎；`@dxz/content` 建好 schema + 校验。
+- **Phase 2 已完成（2a + 2b）**：`@dxz/core` 抽出外壳 UI、练习会话（`useQuizSession`）、错题本状态（`useWrongBook`）、洗牌/去重、通用 CSS；`@dxz/content` 建好 schema + 校验。
 - 地理仍可构建、可运行；构建产物在 `docs/geo/index.html`。
 - 根路径 `docs/index.html` 是**学科落地页**，地理入口 `/geo/`。
-- **Phase 2b 未完成**：通用练习会话状态机 / 洗牌袋还没抽。历史/生物可以复用 UI 组件，但完整 app 还要等 2b。
+- 历史/生物现在可以基于 `@dxz/core` 写自己的 app，只需提供 manifest / lessons / quiz / scenes。
 - 线上 `https://dxz.flowzen.cn/` 已更新为“落地页 + `/geo/`”结构（2026-11-23 部署）。
 
 ---
@@ -79,21 +79,22 @@ npm run release:geo
 5. 构建验证：`npm run build` 通过，地理 1.47 MB；`/geo/` 页面、等高线实验室、错题本迁移均验证。
 6. EdgeOne 已部署 `docs/` ZIP：`https://dxz.flowzen.cn/` 为落地页，`/geo/` 为地理。
 7. **Phase 2a**：抽出 `AppShell` / `Tabs` / `LessonChips` / `LessonHead` / `StepCard` / `StepNav` / `StartScreen` / `QuizHeader` / `Feedback` / `ChoiceQuestion` / `WrongBookPanel` 到 `@dxz/core`，地理改为组合这些组件；外壳 CSS 移到 `packages/core/src/ui.css`。
+8. **Phase 2b**：抽出 `useQuizSession`（练习历史 / 选择 / 下一题 / 错题重练）、`useWrongBook`（错题本状态 + 旧键迁移）、`shuffle` / `createShuffleBag` / `createRecentTracker`；CSS 拆成 `packages/core/src/ui.css` + `apps/geo/src/geo.css`。
 
 ---
 
 ## 4. 待办
 
-### P0 · Phase 2b（会话层 / 练习引擎）
+### P0 · Phase 2（已完成）
 
 - [x] `AppShell` / 顶栏 / 左右布局
 - [x] 页签（讲解 / 练习 / 错题本）
 - [x] `StepCard` / `ChoiceQuestion` / `WrongBookPanel`
 - [x] 外壳 CSS 移到 `packages/core/src/ui.css`
-- [ ] 通用练习会话状态机（tabs、练习历史、错题复习流程）
-- [ ] 通用洗牌袋 / 最近签名去重
-- [ ] CSS 拆成 core base + 各学科样式
-- [ ] 地理改为“只提供 lessons / quiz / scenes / manifest”
+- [x] 通用练习会话状态机 `useQuizSession`
+- [x] 通用洗牌袋 / 最近签名去重
+- [x] CSS 拆成 core base + 各学科样式
+- [~] 地理仍保留自己的 scene 配置与 click 模式（这是学科职责，不是缺口）
 
 ### P1 · 历史
 
@@ -147,9 +148,9 @@ npm run release:geo
 | 学科 | 负责人 / Session | 状态 | 分支 |
 |---|---|---|---|
 | 地理 | 当前 session | 维护中 | `main` |
-| 历史 | 待认领 | 内容可先做，代码等 Phase 2 | `feat/history-*` |
-| 生物 | 待认领 | 内容可先做，代码等 Phase 2 | `feat/biology-*` |
-| 核心 / Phase 2 | 待认领 | 未开始 | `refactor/core-*` |
+| 历史 | 待认领 | 可开始：内容 + app 脚手架 | `feat/history-*` |
+| 生物 | 待认领 | 可开始：内容 + app 脚手架 | `feat/biology-*` |
+| 核心 / Phase 2 | 当前 session | 已完成 | `main` |
 
 ---
 

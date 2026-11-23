@@ -55,12 +55,9 @@ import {
 } from "./lib/coords";
 import { PROVINCE_MAP } from "./data/china";
 import {
-  loadWrongBook,
-  addWrong,
-  reviewResult,
-  dueItems,
-  clearWrongBook,
-  wrongStats,
+  GEO_WRONG_KEY,
+  GEO_WRONG_LEGACY_KEY,
+  wrongInput,
   type WrongItem,
 } from "./lib/wrongbook";
 import {
@@ -75,6 +72,9 @@ import {
   Feedback,
   ChoiceQuestion,
   WrongBookPanel,
+  useWrongBook,
+  useQuizSession,
+  type QuizSessionEntry,
 } from "@dxz/core";
 
 type Tab = "learn" | "practice" | "wrong";
@@ -97,28 +97,28 @@ type ViewMode =
 
 type ClickFeedback = { ok: boolean; reveal: boolean; dist: number; msg: string };
 
-type Entry = {
-  q: Question;
-  review: WrongItem | null;
-  chosen: number | null;
+type EntryExtra = {
   clickPoint: LatLon | null;
   clickFeedback: ClickFeedback | null;
   clickTries: number;
   clickRecorded: boolean;
-  added: boolean;
   pickedProvince: string | null;
 };
+
+type Entry = QuizSessionEntry<Question, QuestionKind, EntryExtra>;
+
+type GeoScope = QuestionKind | "geo" | "china" | "geo4" | "universe";
 
 function newEntry(q: Question, review: WrongItem | null): Entry {
   return {
     q,
     review,
     chosen: null,
+    added: false,
     clickPoint: null,
     clickFeedback: null,
     clickTries: 0,
     clickRecorded: false,
-    added: false,
     pickedProvince: null,
   };
 }
@@ -157,13 +157,21 @@ export default function App() {
   const [lessonIdx, setLessonIdx] = useState(0);
   const [stepIdx, setStepIdx] = useState(0);
 
-  const [history, setHistory] = useState<Entry[]>([]);
-  const [histIdx, setHistIdx] = useState(-1);
-  const [practiceKind, setPracticeKind] = useState<
-    QuestionKind | "geo" | "china" | "geo4" | "universe"
-  >("geo");
+  const wrong = useWrongBook<QuestionKind>(GEO_WRONG_KEY, GEO_WRONG_LEGACY_KEY);
+  const session = useQuizSession<Question, GeoScope, QuestionKind, EntryExtra>({
+    makeQuestion: (scope, avoidKind) => makeForScope(scope, avoidKind),
+    makeVariant,
+    kindOf: (q) => q.kind,
+    createEntry: newEntry,
+    answerOf: (q) => q.answer,
+    userAnswerOf: (q, index) => q.options[index],
+    onWrong: (q, userAnswer) => wrong.add(wrongInput(q), userAnswer),
+    onReview: (id, correct) => wrong.review(id, correct),
+    onQuestionChange: (q) => setViewMode(initialView(q)),
+    onReviewComplete: () => setTab("wrong"),
+    initialScope: "geo",
+  });
 
-  const [wrongbook, setWrongbook] = useState<WrongItem[]>(() => loadWrongBook());
   const [picked, setPicked] = useState<LatLon | null>(null);
   const [hover, setHover] = useState<LatLon | null>(null);
 
@@ -172,15 +180,17 @@ export default function App() {
     () => localStorage.getItem("geo-lab:showlabels") !== "0"
   );
 
-  const entry = histIdx >= 0 ? history[histIdx] ?? null : null;
-  const quiz = entry?.q ?? null;
-  const chosen = entry?.chosen ?? null;
-  const reviewItem = entry?.review ?? null;
+  const entry = session.entry;
+  const quiz = session.quiz;
+  const chosen = session.chosen;
+  const reviewItem = session.reviewItem;
   const clickPoint = entry?.clickPoint ?? null;
   const clickFeedback = entry?.clickFeedback ?? null;
   const clickTries = entry?.clickTries ?? 0;
   const clickRecorded = entry?.clickRecorded ?? false;
   const pickedProvince = entry?.pickedProvince ?? null;
+  const wrongbook = wrong.items;
+  const stats = wrong.stats;
 
   const lesson = LESSONS[lessonIdx];
   const step = lesson.steps[stepIdx];
@@ -194,8 +204,6 @@ export default function App() {
       setViewMode(viewForQuestion(quiz));
     }
   }, [chosen, quiz, tab]);
-
-  const stats = useMemo(() => wrongStats(wrongbook), [wrongbook]);
 
   const globeConfig = useMemo<GlobeConfig>(() => {
     let c: GlobeConfig = {
@@ -321,20 +329,13 @@ export default function App() {
       ? null
       : step.contour?.highlight ?? null;
 
-  function updateEntry(patch: Partial<Entry>) {
-    setHistory((h) => h.map((e, i) => (i === histIdx ? { ...e, ...patch } : e)));
-  }
-
   function goLesson(i: number) {
     setLessonIdx(i);
     setStepIdx(0);
     setPicked(null);
   }
 
-  function makeForScope(
-    scope: QuestionKind | "geo" | "china" | "geo4" | "universe",
-    avoidKind?: QuestionKind
-  ): Question {
+  function makeForScope(scope: GeoScope, avoidKind?: QuestionKind): Question {
     if (scope === "geo" || scope === "china" || scope === "geo4" || scope === "universe") {
       const pool =
         scope === "geo"
@@ -367,42 +368,22 @@ export default function App() {
     if (q.kind === "earth" || q.kind === "map" || q.kind === "contour") return "3d";
     return viewForQuestion(q);
   }
-  function startPractice(scope?: QuestionKind | "geo" | "china" | "geo4" | "universe") {
-    const s = scope ?? "geo";
-    const q = makeForScope(s);
+
+  function startPractice(scope?: GeoScope) {
     setTab("practice");
-    setPracticeKind(s);
-    setHistory([newEntry(q, null)]);
-    setHistIdx(0);
     setPicked(null);
-    setViewMode(initialView(q));
+    session.start(scope ?? "geo");
   }
 
   function startReview(items: WrongItem[]) {
     setTab("practice");
     setPicked(null);
     if (!items.length) {
-      setHistory([]);
-      setHistIdx(-1);
+      session.reset();
       setViewMode("3d");
       return;
     }
-    const entries = items.map((it) => newEntry(makeVariant(it.kind), it));
-    setHistory(entries);
-    setHistIdx(0);
-    setViewMode(initialView(entries[0].q));
-  }
-
-  function answer(i: number) {
-    if (!quiz || chosen !== null) return;
-    const correct = i === quiz.answer;
-    updateEntry({ chosen: i, added: !correct });
-    if (reviewItem) {
-      reviewResult(reviewItem.id, correct);
-    } else if (!correct) {
-      addWrong(quiz, quiz.options[i]);
-    }
-    setWrongbook(loadWrongBook());
+    session.startReview(items);
   }
 
   function submitClick() {
@@ -413,7 +394,7 @@ export default function App() {
     const tries = clickTries + 1;
 
     if (ok) {
-      updateEntry({
+      session.updateEntry({
         clickTries: tries,
         clickFeedback: {
           ok: true,
@@ -422,8 +403,7 @@ export default function App() {
           msg: "很准！你已经能按经纬网定位了。",
         },
       });
-      if (reviewItem) reviewResult(reviewItem.id, true);
-      setWrongbook(loadWrongBook());
+      if (reviewItem) wrong.review(reviewItem.id, true);
       return;
     }
 
@@ -453,14 +433,13 @@ export default function App() {
     };
 
     if (!clickRecorded) {
-      if (reviewItem) reviewResult(reviewItem.id, false);
-      else addWrong(quiz, fmtCoord(clickPoint));
+      if (reviewItem) wrong.review(reviewItem.id, false);
+      else wrong.add(wrongInput(quiz), fmtCoord(clickPoint));
       patch.clickRecorded = true;
       patch.added = true;
-      setWrongbook(loadWrongBook());
     }
 
-    updateEntry(patch);
+    session.updateEntry(patch);
   }
 
   function manualAdd() {
@@ -471,30 +450,16 @@ export default function App() {
         : clickPoint
           ? fmtCoord(clickPoint)
           : "（手动加入）";
-    addWrong(quiz, ans);
-    setWrongbook(loadWrongBook());
-    updateEntry({ added: true });
+    wrong.add(wrongInput(quiz), ans);
+    session.updateEntry({ added: true });
   }
 
   function nextQuestion() {
-    if (histIdx < history.length - 1) {
-      setHistIdx(histIdx + 1);
-      return;
-    }
-    if (history[histIdx]?.review) {
-      setTab("wrong");
-      setHistory([]);
-      setHistIdx(-1);
-      return;
-    }
-    const q = makeForScope(practiceKind, quiz?.kind);
-    setHistory((h) => [...h, newEntry(q, null)]);
-    setHistIdx(histIdx + 1);
-    setViewMode(initialView(q));
+    session.next();
   }
 
   function prevQuestion() {
-    setHistIdx((i) => Math.max(0, i - 1));
+    session.prev();
   }
 
   function handleHover(p: LatLon | null) {
@@ -508,7 +473,7 @@ export default function App() {
   function handlePick(p: LatLon) {
     if (tab === "practice" && quiz?.kind === "clickCoord") {
       if (clickFeedback?.reveal) return;
-      updateEntry({ clickPoint: p, clickFeedback: null });
+      session.updateEntry({ clickPoint: p, clickFeedback: null });
       return;
     }
     if (tab !== "practice") setPicked(p);
@@ -529,9 +494,8 @@ export default function App() {
         dist: 0,
         msg: `找对了！${quiz.targetProvince}`,
       };
-      if (reviewItem) reviewResult(reviewItem.id, true);
-      setWrongbook(loadWrongBook());
-      updateEntry(patch);
+      if (reviewItem) wrong.review(reviewItem.id, true);
+      session.updateEntry(patch);
       return;
     }
 
@@ -546,13 +510,12 @@ export default function App() {
     };
 
     if (!clickRecorded) {
-      if (reviewItem) reviewResult(reviewItem.id, false);
-      else addWrong(quiz, name);
+      if (reviewItem) wrong.review(reviewItem.id, false);
+      else wrong.add(wrongInput(quiz), name);
       patch.clickRecorded = true;
       patch.added = true;
-      setWrongbook(loadWrongBook());
     }
-    updateEntry(patch);
+    session.updateEntry(patch);
   }
 
   function handleProvincePick(name: string | null) {
@@ -877,18 +840,20 @@ export default function App() {
                         reviewItem
                           ? {
                               tag: reviewItem.tag,
-                              remaining: Math.max(0, history.length - histIdx - 1),
+                              remaining: Math.max(
+                                0,
+                                session.history.length - session.histIdx - 1
+                              ),
                             }
                           : null
                       }
-                      canPrev={histIdx > 0}
+                      canPrev={session.histIdx > 0}
                       onPrev={prevQuestion}
                       onChange={
-                        reviewItem ? undefined : () => startPractice(practiceKind)
+                        reviewItem ? undefined : () => startPractice(session.practiceKind)
                       }
                       onClear={() => {
-                        setHistory([]);
-                        setHistIdx(-1);
+                        session.reset();
                       }}
                     />
                     <h3 className="quiz-prompt">{quiz.prompt}</h3>
@@ -993,7 +958,7 @@ export default function App() {
                         explain={quiz.explain}
                         added={!!entry?.added}
                         review={!!reviewItem}
-                        onChoose={answer}
+                        onChoose={session.answer}
                         onManualAdd={manualAdd}
                         onNext={nextQuestion}
                         optionKeys={OPTION_KEYS}
@@ -1008,9 +973,9 @@ export default function App() {
               <WrongBookPanel
                 items={wrongbook}
                 stats={stats}
-                onReviewDue={() => startReview(dueItems(wrongbook))}
+                onReviewDue={() => startReview(wrong.due())}
                 onRetry={(item) => startReview([item])}
-                onClear={() => setWrongbook(clearWrongBook())}
+                onClear={() => wrong.clear()}
               />
             )}
           </div>

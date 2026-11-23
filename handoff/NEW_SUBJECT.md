@@ -8,7 +8,7 @@
 
 - [x] monorepo Phase 1 已完成（`apps/geo` + `packages/core` + `packages/content`）
 - [x] Phase 2a 外壳已完成（`AppShell` / `Tabs` / 讲解卡 / 练习卡 / 错题本卡）
-- [ ] Phase 2b 会话层 / 洗牌袋 / CSS 拆分——完整 app 建议等 2b；没完成时先做内容草稿
+- [x] Phase 2b 会话层已完成（`useQuizSession` / `useWrongBook` / 洗牌袋 / CSS 拆分）
 - [ ] 教材版本、版次、学校进度、考试范围已确认（见 `handoff/CONTENT.md` §1）
 - [ ] 在 `HANDOFF.md` §7 学科认领表登记：学科 / session / 分支
 - [ ] 已读 `AGENTS.md`、`SPEC.md`、`HANDOFF.md`、`handoff/ARCHITECTURE.md`、`handoff/CONTENT.md`
@@ -17,14 +17,9 @@
 
 ## 1. 建 app
 
-**Phase 2b 完成前，不要 `cp -r apps/geo apps/history`。**
-外壳 UI 已在 core，但会话状态机还在地理 App 里；直接复制会带一堆地理逻辑。
-现在先做内容草稿（章节、讲解、题目、scene 草图）。
-
-Phase 2b 完成后，再基于 core 外壳建 app：
+外壳、练习会话、错题本已经在 `@dxz/core`，可以直接建 app；**不要复制地理的 lessons / quiz / scenes**。
 
 ```powershell
-# Phase 2b 之后
 cp -r apps/geo apps/history
 ```
 
@@ -33,7 +28,8 @@ cp -r apps/geo apps/history
 - [ ] 改 `apps/history/package.json` 的 `name` 为 `@dxz/history`
 - [ ] 改 `vite.config.ts` 的 `base` 仍为 `./`
 - [ ] 改 `index.html` 的 title
-- [ ] 删除 geo 的 `lessons.ts` / `quiz/` / `scenes/`，保留空目录
+- [ ] 删除 geo 的 `lessons.ts` / `lib/quiz.ts` / `globe/` / `data/geo4.ts`，保留空目录
+- [ ] 把 `App.tsx` 里的地理 scene 分支替换成历史的 scene
 - [ ] 确认 `scripts/copy-docs.mjs history` 输出到 `docs/history/index.html`
 - [ ] 在根 `package.json` 加 `dev:history` / `build:history`
 

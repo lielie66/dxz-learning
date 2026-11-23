@@ -14,6 +14,7 @@ import {
   randInt,
   pick,
 } from "./coords";
+import { createRecentTracker, createShuffleBag, shuffleWithAnswer } from "@dxz/core";
 import { PROVINCES } from "../data/china";
 import { CLIMATE_CITIES, CLIMATE_TYPES } from "../data/geo4";
 
@@ -105,44 +106,12 @@ const TAGS: Record<QuestionKind, string> = {
   space: "太空探索",
 };
 
-function shuffleWithAnswer(correct: string, distractors: string[]): { options: string[]; answer: number } {
-  const uniq = [correct];
-  for (const d of distractors) {
-    if (!uniq.includes(d)) uniq.push(d);
-  }
-  for (let i = uniq.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [uniq[i], uniq[j]] = [uniq[j], uniq[i]];
-  }
-  return { options: uniq, answer: uniq.indexOf(correct) };
-}
-
 // ---------- 去重：最近出过的题不再出 ----------
-const recentSigs: string[] = [];
-const RECENT_MAX = 30;
+const recent = createRecentTracker(30);
 
 /** 洗牌袋：固定小池子先把每一项都出完，再重新洗牌 */
-const bags = new Map<string, number[]>();
-const lastPick = new Map<string, number>();
-
-function drawBag(key: string, size: number): number {
-  let bag = bags.get(key);
-  if (!bag || bag.length === 0) {
-    bag = Array.from({ length: size }, (_, i) => i);
-    for (let i = bag.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [bag[i], bag[j]] = [bag[j], bag[i]];
-    }
-    const last = lastPick.get(key);
-    if (last !== undefined && bag.length > 1 && bag[bag.length - 1] === last) {
-      [bag[bag.length - 1], bag[0]] = [bag[0], bag[bag.length - 1]];
-    }
-    bags.set(key, bag);
-  }
-  const idx = bag.pop()!;
-  lastPick.set(key, idx);
-  return idx;
-}
+const bag = createShuffleBag();
+const drawBag = bag.draw;
 
 function randomPoint(): LatLon {
   const lat = randInt(5, 65) * (Math.random() < 0.5 ? -1 : 1);
@@ -1660,13 +1629,10 @@ export const CHINA_KINDS: QuestionKind[] = [
 
 function fresh(kind: QuestionKind): Question {
   let q = MAKERS[kind]();
-  for (let i = 0; i < 25 && q.sig && recentSigs.includes(q.sig); i++) {
+  for (let i = 0; i < 25 && q.sig && recent.has(q.sig); i++) {
     q = MAKERS[kind]();
   }
-  if (q.sig) {
-    recentSigs.push(q.sig);
-    if (recentSigs.length > RECENT_MAX) recentSigs.shift();
-  }
+  if (q.sig) recent.add(q.sig);
   return q;
 }
 

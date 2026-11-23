@@ -4,6 +4,10 @@ export type { WrongItem, WrongInput, WrongStats } from "./types";
 export { readJSON, writeJSON, readMigratedJSON } from "./storage";
 export { createWrongBook } from "./wrongbook";
 export type { WrongBookOptions } from "./wrongbook";
+export { createRecentTracker, createShuffleBag, shuffle, shuffleWithAnswer } from "./random";
+export { useWrongBook } from "./useWrongBook";
+export { useQuizSession } from "./useQuizSession";
+export type { QuizSessionEntry, QuizSessionOptions } from "./useQuizSession";
 
 export { AppShell } from "./ui/AppShell";
 export type { AppShellProps, ShellPill } from "./ui/AppShell";
