@@ -13,7 +13,7 @@
 - 地理仍可构建、可运行；构建产物在 `docs/geo/index.html`。
 - 根路径 `docs/index.html` 是**学科落地页**，地理入口 `/geo/`。
 - **Phase 2 未完成**：外壳、页签、讲解/练习/错题 UI 还没抽到 core。历史/生物可以先做内容与 scene，暂不要复制外壳。
-- 线上 `https://dxz.flowzen.cn/` 目前还是拆分前的旧部署（根路径直接是地理）；需要按 `handoff/DEPLOY.md` 部署 `docs/` 目录后，才会变成“落地页 + /geo/”。
+- 线上 `https://dxz.flowzen.cn/` 已更新为“落地页 + `/geo/`”结构（2026-11-23 部署）。
 
 ---
 
@@ -21,7 +21,7 @@
 
 | 渠道 | 地址 | 状态 |
 |---|---|---|
-| 主站（EdgeOne Pages） | <https://dxz.flowzen.cn/> | 旧版：根路径是地理；待部署新版 |
+| 主站（EdgeOne Pages） | <https://dxz.flowzen.cn/> | 新版：落地页 + `/geo/` |
 | GitHub 仓库 | <https://github.com/lielie66/dxz-learning> | `main` |
 | GitHub Pages | <https://lielie66.github.io/dxz-learning/> | 推送后自动构建 |
 | Gitee 镜像 | <https://gitee.com/acef09/dxz-learning> | 内容已同步；历史与 GitHub 不同（网页上传） |
@@ -77,6 +77,7 @@ npm run release:geo
 3. `packages/content`：`SubjectManifest` / `LessonStepBase` / `QuestionBase` + 基础校验。
 4. 落地页 `site/index.html`：地理已上线，历史/生物“开发中”，含离线包入口。
 5. 构建验证：`npm run build` 通过，地理 1.47 MB；`/geo/` 页面、等高线实验室、错题本迁移均验证。
+6. EdgeOne 已部署 `docs/` ZIP：`https://dxz.flowzen.cn/` 为落地页，`/geo/` 为地理。
 
 ---
 
@@ -118,7 +119,6 @@ npm run release:geo
 
 | 问题 | 影响 | 处理 |
 |---|---|---|
-| 线上还是旧部署 | 根路径直接是地理，没有落地页/`/geo/` | 按 DEPLOY 部署 `docs/` 目录 |
 | Gitee 历史与 GitHub 不同 | 网页上传产生不同 commit；未来 `git push` 可能 non-fast-forward | 有 Gitee 写权限时强制推一次，统一历史 |
 | Chrome Safe Browsing 红页 | 另一台电脑打开主站会先看到红页 | 已提交误报申诉；见 §6 |
 | `npm run validate` 不存在 | SPEC 提到但未实现 | P2，用 `@dxz/content` 补 |
