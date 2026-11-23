@@ -76,6 +76,7 @@ import {
   useQuizSession,
   type QuizSessionEntry,
 } from "@dxz/core";
+import "./geo.css";
 
 type Tab = "learn" | "practice" | "wrong";
 type ViewMode =

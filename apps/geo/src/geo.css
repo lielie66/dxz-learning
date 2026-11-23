@@ -1,3 +1,210 @@
+.flat-wrap {
+  position: absolute;
+  inset: 0;
+}
+
+.flat-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: crosshair;
+}
+
+.globe-label {
+  font-size: 10.5px;
+  line-height: 1;
+  padding: 2px 5px;
+  border-radius: 6px;
+  background: rgba(8, 20, 35, 0.7);
+  color: #dbeafe;
+  border: 1px solid rgba(148, 197, 255, 0.22);
+  white-space: nowrap;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.2px;
+}
+
+.view-switch {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 999px;
+  background: rgba(9, 20, 34, 0.62);
+  border: 1px solid rgba(148, 197, 255, 0.18);
+  backdrop-filter: blur(6px);
+  z-index: 3;
+}
+
+.view-switch button {
+  border: 0;
+  background: transparent;
+  color: #9fbddc;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 11px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.view-switch button.on {
+  background: #2563eb;
+  color: #fff;
+}
+
+.globe-canvas {
+  position: absolute;
+  inset: 0;
+}
+
+.stage-legend {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  display: flex;
+  gap: 14px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(9, 20, 34, 0.55);
+  border: 1px solid rgba(148, 197, 255, 0.16);
+  color: #cfe3ff;
+  font-size: 12px;
+  backdrop-filter: blur(6px);
+}
+
+.stage-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legend-toggle {
+  border: 1px solid rgba(148, 197, 255, 0.28);
+  background: rgba(37, 99, 235, 0.32);
+  color: #dbeafe;
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 4px 9px;
+  border-radius: 999px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.legend-toggle:not(.on) {
+  background: rgba(9, 20, 34, 0.5);
+  color: #8aa8c8;
+}
+
+.legend-toggle:hover {
+  border-color: rgba(148, 197, 255, 0.55);
+}
+
+.dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.dot-red {
+  background: #ef4444;
+}
+
+.dot-blue {
+  background: #3b82f6;
+}
+
+.dot-amber {
+  background: #fbbf24;
+}
+
+.stage-hint {
+  position: absolute;
+  left: 16px;
+  bottom: 14px;
+  font-size: 12px;
+  color: #93b4d6;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.hover-coord {
+  font-variant-numeric: tabular-nums;
+  color: #dbeafe;
+  background: rgba(9, 20, 34, 0.6);
+  padding: 3px 9px;
+  border-radius: 8px;
+  border: 1px solid rgba(148, 197, 255, 0.18);
+}
+
+.pick-card {
+  position: absolute;
+  right: 18px;
+  bottom: 18px;
+  width: 250px;
+  padding: 16px 18px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.97);
+  box-shadow: 0 18px 40px rgba(2, 12, 27, 0.35);
+  animation: pop 0.18s ease-out;
+}
+
+@keyframes pop {
+  from {
+    transform: translateY(8px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.pick-close {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  border: 0;
+  background: transparent;
+  font-size: 20px;
+  line-height: 1;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.pick-title {
+  font-size: 12px;
+  color: var(--muted);
+  letter-spacing: 1px;
+}
+
+.pick-coord {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 6px 0 10px;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.pick-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.pick-grid span {
+  font-size: 12px;
+  padding: 4px 9px;
+  border-radius: 8px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+}
+
 /* ---------- 三级阶梯 ---------- */
 .terrain-wrap {
   position: absolute;
