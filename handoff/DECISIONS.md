@@ -8,7 +8,7 @@
 ## D-001 · 单仓库多学科（monorepo）
 
 - 日期：2026-11-08
-- 状态：**Phase 1 已完成（2026-11-23），Phase 2 待做**
+- 状态：**Phase 1 完成（2026-11-23）；Phase 2a 外壳完成；Phase 2b 待做**
 - 背景：地理、历史、生物要共用外壳、练习引擎、错题本；分三个仓库会复制三份核心代码，用户还要记三个地址。
 - 决定：同一仓库，目标结构 `apps/geo|history|biology` + `packages/core` + `packages/content`。
 - 后果：

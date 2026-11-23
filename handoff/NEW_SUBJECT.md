@@ -7,7 +7,8 @@
 ## 0. 前置条件
 
 - [x] monorepo Phase 1 已完成（`apps/geo` + `packages/core` + `packages/content`）
-- [ ] Phase 2（外壳 / 页签 / 练习卡抽到 core）完成——**推荐等**；没完成时先做内容草稿
+- [x] Phase 2a 外壳已完成（`AppShell` / `Tabs` / 讲解卡 / 练习卡 / 错题本卡）
+- [ ] Phase 2b 会话层 / 洗牌袋 / CSS 拆分——完整 app 建议等 2b；没完成时先做内容草稿
 - [ ] 教材版本、版次、学校进度、考试范围已确认（见 `handoff/CONTENT.md` §1）
 - [ ] 在 `HANDOFF.md` §7 学科认领表登记：学科 / session / 分支
 - [ ] 已读 `AGENTS.md`、`SPEC.md`、`HANDOFF.md`、`handoff/ARCHITECTURE.md`、`handoff/CONTENT.md`
@@ -16,13 +17,14 @@
 
 ## 1. 建 app
 
-**Phase 2 完成前，不要 `cp -r apps/geo apps/history`。**
-现在先做内容草稿（章节、讲解、题目、scene 草图），不要复制地理外壳。
+**Phase 2b 完成前，不要 `cp -r apps/geo apps/history`。**
+外壳 UI 已在 core，但会话状态机还在地理 App 里；直接复制会带一堆地理逻辑。
+现在先做内容草稿（章节、讲解、题目、scene 草图）。
 
-Phase 2 完成后，再从 core 外壳建 app：
+Phase 2b 完成后，再基于 core 外壳建 app：
 
 ```powershell
-# Phase 2 之后
+# Phase 2b 之后
 cp -r apps/geo apps/history
 ```
 

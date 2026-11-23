@@ -9,10 +9,10 @@
 ## 0. 一页结论
 
 - **monorepo Phase 1 已完成**：地理迁入 `apps/geo`，根目录是 npm workspaces。
-- 已抽出 `@dxz/core` 的**类型 / 存储 / 错题本**；`@dxz/content` 的 **schema + 校验**已建好。
+- **Phase 2a 已完成**：`@dxz/core` 抽出外壳 UI（`AppShell` / `Tabs` / 讲解卡 / 练习卡 / 错题本卡）、类型、存储、错题本引擎；`@dxz/content` 建好 schema + 校验。
 - 地理仍可构建、可运行；构建产物在 `docs/geo/index.html`。
 - 根路径 `docs/index.html` 是**学科落地页**，地理入口 `/geo/`。
-- **Phase 2 未完成**：外壳、页签、讲解/练习/错题 UI 还没抽到 core。历史/生物可以先做内容与 scene，暂不要复制外壳。
+- **Phase 2b 未完成**：通用练习会话状态机 / 洗牌袋还没抽。历史/生物可以复用 UI 组件，但完整 app 还要等 2b。
 - 线上 `https://dxz.flowzen.cn/` 已更新为“落地页 + `/geo/`”结构（2026-11-23 部署）。
 
 ---
@@ -24,8 +24,8 @@
 | 主站（EdgeOne Pages） | <https://dxz.flowzen.cn/> | 新版：落地页 + `/geo/` |
 | GitHub 仓库 | <https://github.com/lielie66/dxz-learning> | `main` |
 | GitHub Pages | <https://lielie66.github.io/dxz-learning/> | 推送后自动构建 |
-| Gitee 镜像 | <https://gitee.com/acef09/dxz-learning> | 内容已同步；历史与 GitHub 不同（网页上传） |
-| Gitee 离线包 | <https://gitee.com/acef09/dxz-learning/raw/main/release/geo-lab-offline.zip> | 414,859 B |
+| Gitee 镜像 | <https://gitee.com/acef09/dxz-learning> | 已与 GitHub 同一提交 |
+| Gitee 离线包 | <https://gitee.com/acef09/dxz-learning/raw/main/release/geo-lab-offline.zip> | 415,042 B |
 | GitHub Release | `v0.1.0` → `geo-lab-offline.zip` | 当前版本 |
 
 EdgeOne：
@@ -78,18 +78,21 @@ npm run release:geo
 4. 落地页 `site/index.html`：地理已上线，历史/生物“开发中”，含离线包入口。
 5. 构建验证：`npm run build` 通过，地理 1.47 MB；`/geo/` 页面、等高线实验室、错题本迁移均验证。
 6. EdgeOne 已部署 `docs/` ZIP：`https://dxz.flowzen.cn/` 为落地页，`/geo/` 为地理。
+7. **Phase 2a**：抽出 `AppShell` / `Tabs` / `LessonChips` / `LessonHead` / `StepCard` / `StepNav` / `StartScreen` / `QuizHeader` / `Feedback` / `ChoiceQuestion` / `WrongBookPanel` 到 `@dxz/core`，地理改为组合这些组件；外壳 CSS 移到 `packages/core/src/ui.css`。
 
 ---
 
 ## 4. 待办
 
-### P0 · Phase 2（外壳抽 core）
+### P0 · Phase 2b（会话层 / 练习引擎）
 
-- [ ] `AppShell` / 顶栏 / 左右布局
-- [ ] 页签（讲解 / 练习 / 错题本）
-- [ ] `StepCard` / `QuizCard` / `WrongBookView` / `StatsBar`
+- [x] `AppShell` / 顶栏 / 左右布局
+- [x] 页签（讲解 / 练习 / 错题本）
+- [x] `StepCard` / `ChoiceQuestion` / `WrongBookPanel`
+- [x] 外壳 CSS 移到 `packages/core/src/ui.css`
+- [ ] 通用练习会话状态机（tabs、练习历史、错题复习流程）
 - [ ] 通用洗牌袋 / 最近签名去重
-- [ ] 设计变量与基础 CSS 拆成 `packages/core`
+- [ ] CSS 拆成 core base + 各学科样式
 - [ ] 地理改为“只提供 lessons / quiz / scenes / manifest”
 
 ### P1 · 历史
@@ -119,12 +122,12 @@ npm run release:geo
 
 | 问题 | 影响 | 处理 |
 |---|---|---|
-| Gitee 历史与 GitHub 不同 | 网页上传产生不同 commit；未来 `git push` 可能 non-fast-forward | 有 Gitee 写权限时强制推一次，统一历史 |
 | Chrome Safe Browsing 红页 | 另一台电脑打开主站会先看到红页 | 已提交误报申诉；见 §6 |
 | `npm run validate` 不存在 | SPEC 提到但未实现 | P2，用 `@dxz/content` 补 |
 | 无自动化测试 | 改 quiz/错题本风险高 | P2 |
 | `ValleyContour` / `Terrain3D` 已不被课程引用 | 死代码，仍进打包 | 确认后删除 |
-| Phase 2 未做 | 历史/生物没有可复用的外壳 | 先做内容，等 core |
+| Phase 2b 未做 | 历史/生物还没有通用会话层 | 先做内容；2b 抽 session hook |
+| `ui.css` 仍含地理场景样式 | 历史/生物会带入未用 CSS | 后续拆 core base + 学科样式 |
 | EdgeOne 根目录 `.zip` 404 | 离线包不能当站点静态文件 | 继续放 Release / Gitee raw |
 
 ---

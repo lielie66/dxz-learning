@@ -56,14 +56,18 @@ dxz-learning/
 - `WrongItem` / `WrongInput` / `WrongStats` 类型
 - `createWrongBook()`：错题本引擎，按学科传入 `storageKey`，支持旧键迁移
 - `readJSON` / `writeJSON` / `readMigratedJSON`
+- 外壳 UI：`AppShell`、`Tabs`、`LessonChips` / `LessonHead` / `StepCard` / `StepNav`
+- 练习 UI：`StartScreen`、`QuizHeader`、`Feedback`、`ChoiceQuestion`
+- 错题本 UI：`WrongBookPanel`
+- 基础 CSS：`packages/core/src/ui.css`（暂含地理场景样式，后续再拆）
 
-**尚未抽取（Phase 2）：**
+**尚未抽取（Phase 2b）：**
 
-- `AppShell`、页签、讲解卡、练习卡、错题本 UI
-- 通用练习引擎 / 洗牌袋
-- 设计变量与基础 CSS
+- 通用练习会话状态机 / `useSubjectSession`（tabs、练习历史、错题复习流程）
+- 通用洗牌袋 / 最近签名去重
+- CSS 拆成 core base + 各学科样式
 
-历史和生物在 Phase 2 完成前，**不要复制 `apps/geo` 的外壳**；先做内容与 scene，外壳等 core 抽好再统一。
+历史/生物现在可以复用 core 的 UI 组件，但会话层还没抽；建议先做内容与 scene，等 2b 再写完整 app。
 
 ## 3. 常用命令
 
@@ -89,13 +93,14 @@ npm run release:geo
 
 | 路径 | 职责 |
 |---|---|
-| `apps/geo/src/App.tsx` | 地理应用外壳（未来抽到 core） |
+| `apps/geo/src/App.tsx` | 地理应用：状态、场景切换、页面组合（外壳用 core） |
 | `apps/geo/src/lessons.ts` | 地理 20 课 |
 | `apps/geo/src/lib/quiz.ts` | 地理 24 类题 |
 | `apps/geo/src/lib/wrongbook.ts` | 薄包装：调用 `@dxz/core`，键 `dxz:geo:wrongbook:v1` |
 | `apps/geo/src/globe/*` | 地理场景组件 |
-| `apps/geo/src/styles.css` | 地理 + 外壳样式（未来拆分） |
-| `packages/core/src/*` | 通用类型、存储、错题本 |
+| `packages/core/src/ui/*` | 通用外壳 / 页签 / 讲解卡 / 练习卡 / 错题本 UI |
+| `packages/core/src/ui.css` | 通用样式（暂含地理场景样式） |
+| `packages/core/src/{types,storage,wrongbook}.ts` | 类型、存储、错题本引擎 |
 | `packages/content/src/*` | 学科 manifest / lesson / question schema、校验 |
 | `site/index.html` | 学科落地页 |
 | `docs/index.html` | 构建产物：落地页 |

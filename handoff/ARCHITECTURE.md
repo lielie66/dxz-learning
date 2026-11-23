@@ -36,15 +36,19 @@ dxz-learning/
 - `WrongItem` / `WrongInput` / `WrongStats`
 - `createWrongBook()`（按学科传入 `storageKey`，支持旧键迁移）
 - `readJSON` / `writeJSON` / `readMigratedJSON`
+- 外壳 UI：`AppShell` / `Tabs` / `LessonChips` / `LessonHead` / `StepCard` / `StepNav`
+- 练习 UI：`StartScreen` / `QuizHeader` / `Feedback` / `ChoiceQuestion`
+- 错题本 UI：`WrongBookPanel`
+- 基础 CSS：`packages/core/src/ui.css`（暂含地理场景样式）
 
-**尚未抽取（Phase 2）：**
+**尚未抽取（Phase 2b）：**
 
-- `AppShell`、顶栏、左右布局
-- 页签、讲解卡、练习卡、错题本 UI
+- 通用练习会话状态机（tabs、练习历史、错题复习流程）
 - 通用洗牌袋 / 最近签名去重
-- 设计变量与基础 CSS
+- CSS 拆成 core base + 各学科样式
+- 地理 App 仍保留状态与场景切换逻辑
 
-因此：历史和生物现在**可以写内容、做 scene**，但**不要复制 `apps/geo` 的外壳**，等 Phase 2。
+因此：历史和生物现在**可以复用 UI 组件**，但完整 app 的会话层还要等 2b；先写内容与 scene。
 
 ---
 
@@ -146,29 +150,30 @@ site/index.html                → docs/index.html
 
 ## 4. Phase 2：抽 core 的步骤
 
-### Step 1 · 抽 UI 外壳
+### Step 1 · 抽 UI 外壳（Phase 2a 已完成）
 
-- [ ] `AppShell`：顶栏、左右布局、响应式
-- [ ] `Tabs`：讲解 / 练习 / 错题本
-- [ ] `StepCard`：标题、正文、bullets、tip、步骤计数
-- [ ] `QuizCard`：题干、选项、反馈、下一题
-- [ ] `WrongBookView`：统计、列表、复习入口
-- [ ] 把 `apps/geo/src/styles.css` 拆成 `core/base.css` + `apps/geo/geo.css`
+- [x] `AppShell`：顶栏、左右布局、响应式
+- [x] `Tabs`：讲解 / 练习 / 错题本
+- [x] `StepCard`：标题、正文、bullets、tip、步骤计数
+- [x] `ChoiceQuestion`：选项、反馈、蒙对加错题、下一题
+- [x] `WrongBookPanel`：统计、列表、复习入口
+- [~] 外壳 CSS 已移到 `packages/core/src/ui.css`，但还含地理场景样式，待拆成 core base + `apps/geo/geo.css`
 
-### Step 2 · 抽练习引擎
+### Step 2 · 抽练习会话层（Phase 2b，待做）
 
 - [ ] 洗牌袋（shuffle bag）
 - [ ] 最近 N 题签名去重
 - [ ] 题目工厂注册表：学科传入 `makeQuestion(kind)`
+- [ ] `useSubjectSession`：tabs / 练习历史 / 错题复习流程
 - [ ] `QuestionBase` 扩展：地理的 visual / geo4Visual 放回 geo
 
-### Step 3 · 地理改为纯配置
+### Step 3 · 地理改为纯配置（部分完成）
 
+- [x] 外壳从 `@dxz/core` 引入（`AppShell` / `Tabs` / 讲解 / 练习 / 错题本）
 - [ ] `apps/geo/src/App.tsx` 只保留地理的 lessons / quiz / scenes / 视图分支
-- [ ] 外壳从 `@dxz/core` 引入
 - [ ] 行为与样式完全不变
 
-### Step 4 · 历史 / 生物脚手架
+### Step 4 · 历史 / 生物脚手架（待 2b）
 
 按 `handoff/NEW_SUBJECT.md`：
 

@@ -129,7 +129,7 @@ docs/                  构建产物（index.html + geo/index.html）
 
 - 改讲解文案：`apps/geo/src/lessons.ts`
 - 加题型：`apps/geo/src/lib/quiz.ts` 里加 `makeXxx()`，注册到 `MAKERS` 和 `GEO_KINDS` / `CHINA_KINDS`
-- 改配色字号：`apps/geo/src/styles.css`
+- 改配色字号：`packages/core/src/ui.css`
 - 改错题本逻辑：`packages/core/src/wrongbook.ts`（注意兼容旧键）
 
 ## 数据与版权

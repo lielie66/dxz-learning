@@ -63,7 +63,19 @@ import {
   wrongStats,
   type WrongItem,
 } from "./lib/wrongbook";
-import "./styles.css";
+import {
+  AppShell,
+  Tabs,
+  LessonChips,
+  LessonHead,
+  StepCard,
+  StepNav,
+  StartScreen,
+  QuizHeader,
+  Feedback,
+  ChoiceQuestion,
+  WrongBookPanel,
+} from "@dxz/core";
 
 type Tab = "learn" | "practice" | "wrong";
 type ViewMode =
@@ -566,23 +578,13 @@ export default function App() {
             : "第 2 章第 1 节 · 地球和地球仪";
 
   return (
-    <div className="app">
-      <header className="topbar">
-        <div className="brand">
-          <div className="brand-mark">地</div>
-          <div>
-            <h1>地理实验室</h1>
-            <p>中图版 · 七年级上册 · {chapter}</p>
-          </div>
-        </div>
-        <div className="topbar-right">
-          <span className="pill">七年级上</span>
-          <span className="pill pill-soft">3D 地球仪</span>
-        </div>
-      </header>
-
-      <main className="layout">
-        <section className="stage">
+    <AppShell
+      mark="地"
+      title="地理实验室"
+      subtitle={`中图版 · 七年级上册 · ${chapter}`}
+      pills={[{ text: "七年级上" }, { text: "3D 地球仪", soft: true }]}
+      stage={
+        <>
           <div className={viewMode === "split" ? "stage-canvas split" : "stage-canvas"}>
             {viewMode === "contourlab" ? (
               <div className="pane">
@@ -756,199 +758,139 @@ export default function App() {
               </div>
             </div>
           )}
-        </section>
-
-        <aside className="panel">
-          <nav className="tabs">
-            <button className={tab === "learn" ? "tab active" : "tab"} onClick={() => setTab("learn")}>
-              讲解
-            </button>
-            <button
-              className={tab === "practice" ? "tab active" : "tab"}
-              onClick={() => {
-                setTab("practice");
-                setPicked(null);
-              }}
-            >
-              练习
-            </button>
-            <button className={tab === "wrong" ? "tab active" : "tab"} onClick={() => setTab("wrong")}>
-              错题本
-              {stats.due > 0 && <em className="badge">{stats.due}</em>}
-            </button>
-          </nav>
+        </>
+      }
+      panel={
+        <>
+          <Tabs
+            tabs={[
+              { id: "learn", label: "讲解" },
+              { id: "practice", label: "练习" },
+              { id: "wrong", label: "错题本", badge: stats.due },
+            ]}
+            active={tab}
+            onChange={(id) => {
+              setTab(id as Tab);
+              if (id === "practice") setPicked(null);
+            }}
+          />
 
           <div className="panel-body">
             {tab === "learn" && (
               <>
-                <div className="lesson-chips">
-                  {LESSONS.map((l, i) => (
-                    <button
-                      key={l.id}
-                      className={i === lessonIdx ? "chip active" : "chip"}
-                      onClick={() => goLesson(i)}
-                    >
-                      {l.title.split(" · ")[0]}
-                    </button>
-                  ))}
-                </div>
+                <LessonChips
+                  items={LESSONS.map((l) => ({ id: l.id, label: l.title.split(" · ")[0] }))}
+                  activeIndex={lessonIdx}
+                  onSelect={goLesson}
+                />
 
-                <div className="lesson-head">
-                  <h2>{lesson.title}</h2>
-                  <p>{lesson.subtitle}</p>
-                </div>
+                <LessonHead title={lesson.title} subtitle={lesson.subtitle} />
 
-                <article className="step-card">
-                  <div className="step-count">
-                    第 {stepIdx + 1} / {lesson.steps.length} 步
-                  </div>
-                  <h3>{step.title}</h3>
-                  <p className="step-body">{step.body}</p>
-                  {step.bullets && (
-                    <ul className="step-bullets">
-                      {step.bullets.map((b) => (
-                        <li key={b}>{b}</li>
-                      ))}
-                    </ul>
-                  )}
-                  {step.tip && <div className="tip">{step.tip}</div>}
-                </article>
+                <StepCard
+                  stepIndex={stepIdx}
+                  stepTotal={lesson.steps.length}
+                  title={step.title}
+                  body={step.body}
+                  bullets={step.bullets}
+                  tip={step.tip}
+                />
 
-                <div className="step-nav">
-                  <button
-                    className="btn ghost"
-                    disabled={stepIdx === 0}
-                    onClick={() => setStepIdx((v) => Math.max(0, v - 1))}
-                  >
-                    上一步
-                  </button>
-                  <div className="dots">
-                    {lesson.steps.map((_, i) => (
-                      <button
-                        key={i}
-                        className={i === stepIdx ? "dot-btn active" : "dot-btn"}
-                        onClick={() => setStepIdx(i)}
-                        aria-label={`第 ${i + 1} 步`}
-                      />
-                    ))}
-                  </div>
-                  {stepIdx < lesson.steps.length - 1 ? (
-                    <button className="btn" onClick={() => setStepIdx((v) => v + 1)}>
-                      下一步
-                    </button>
-                  ) : (
-                    <button
-                      className="btn"
-                      onClick={() =>
-                        startPractice(
-                          ["territory", "admin", "population", "ethnic"].includes(lesson.id)
-                            ? "china"
-                            : ["terrain", "climate", "weather", "rivers", "divides"].includes(
-                                  lesson.id
-                                )
-                              ? "geo4"
-                              : "geo"
-                        )
-                      }
-                    >
-                      去练一练
-                    </button>
-                  )}
-                </div>
+                <StepNav
+                  stepIndex={stepIdx}
+                  stepTotal={lesson.steps.length}
+                  onPrev={() => setStepIdx((v) => Math.max(0, v - 1))}
+                  onJump={setStepIdx}
+                  onNext={() => {
+                    if (stepIdx < lesson.steps.length - 1) {
+                      setStepIdx((v) => v + 1);
+                    } else {
+                      startPractice(
+                        ["territory", "admin", "population", "ethnic"].includes(lesson.id)
+                          ? "china"
+                          : ["terrain", "climate", "weather", "rivers", "divides"].includes(lesson.id)
+                            ? "geo4"
+                            : "geo"
+                      );
+                    }
+                  }}
+                  lastLabel="去练一练"
+                />
               </>
             )}
 
             {tab === "practice" && (
               <>
                 {!quiz && (
-                  <div className="start-screen">
-                    <h2>练一练</h2>
-                    <p>题目会随机生成，可以一直练，不会重复背答案。</p>
-                    <button className="btn big" onClick={() => startPractice("geo")}>
-                      随机练 · 地球与地图
-                    </button>
-                    <button className="btn big ghost" onClick={() => startPractice("china")}>
-                      随机练 · 中国的疆域和人口
-                    </button>
-                    <button className="btn big ghost" onClick={() => startPractice("geo4")}>
-                      随机练 · 中国的自然环境
-                    </button>
-                    <button className="btn big ghost" onClick={() => startPractice("universe")}>
-                      随机练 · 地球的宇宙环境
-                    </button>
-
-                    <div className="kind-section">第 1 章 · 地球的宇宙环境</div>
-                    <div className="kind-grid">
-                      {UNIVERSE_KINDS.map((k) => (
-                        <button key={k} className="kind-btn" onClick={() => startPractice(k)}>
-                          {KIND_LABELS[k]}
-                        </button>
-                      ))}
-                    </div>
-
-                    <div className="kind-section">第 2 章 · 地球和地图</div>
-                    <div className="kind-grid">
-                      {GEO_KINDS.map((k) => (
-                        <button key={k} className="kind-btn" onClick={() => startPractice(k)}>
-                          {KIND_LABELS[k]}
-                        </button>
-                      ))}
-                    </div>
-
-                    <div className="kind-section">第 3 章 · 中国的疆域和人口</div>
-                    <div className="kind-grid">
-                      {CHINA_KINDS.map((k) => (
-                        <button key={k} className="kind-btn" onClick={() => startPractice(k)}>
-                          {KIND_LABELS[k]}
-                        </button>
-                      ))}
-                    </div>
-
-                    <div className="kind-section">第 4 章 · 中国的自然环境</div>
-                    <div className="kind-grid">
-                      {GEO4_KINDS.map((k) => (
-                        <button key={k} className="kind-btn" onClick={() => startPractice(k)}>
-                          {KIND_LABELS[k]}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
+                  <StartScreen
+                    quickButtons={[
+                      {
+                        label: "随机练 · 地球与地图",
+                        onClick: () => startPractice("geo"),
+                        primary: true,
+                      },
+                      { label: "随机练 · 中国的疆域和人口", onClick: () => startPractice("china") },
+                      { label: "随机练 · 中国的自然环境", onClick: () => startPractice("geo4") },
+                      { label: "随机练 · 地球的宇宙环境", onClick: () => startPractice("universe") },
+                    ]}
+                    sections={[
+                      {
+                        title: "第 1 章 · 地球的宇宙环境",
+                        items: UNIVERSE_KINDS.map((k) => ({
+                          id: k,
+                          label: KIND_LABELS[k],
+                          onClick: () => startPractice(k),
+                        })),
+                      },
+                      {
+                        title: "第 2 章 · 地球和地图",
+                        items: GEO_KINDS.map((k) => ({
+                          id: k,
+                          label: KIND_LABELS[k],
+                          onClick: () => startPractice(k),
+                        })),
+                      },
+                      {
+                        title: "第 3 章 · 中国的疆域和人口",
+                        items: CHINA_KINDS.map((k) => ({
+                          id: k,
+                          label: KIND_LABELS[k],
+                          onClick: () => startPractice(k),
+                        })),
+                      },
+                      {
+                        title: "第 4 章 · 中国的自然环境",
+                        items: GEO4_KINDS.map((k) => ({
+                          id: k,
+                          label: KIND_LABELS[k],
+                          onClick: () => startPractice(k),
+                        })),
+                      },
+                    ]}
+                  />
                 )}
 
                 {quiz && (
                   <div className="quiz">
-                    {reviewItem && (
-                      <div className="review-banner">
-                        错题重练 · {reviewItem.tag}
-                        <span>还剩 {Math.max(0, history.length - histIdx - 1)} 道</span>
-                      </div>
-                    )}
-                    <div className="quiz-tag">
-                      <span>{KIND_LABELS[quiz.kind]}</span>
-                      <span className="quiz-tools">
-                        <button
-                          className="link"
-                          disabled={histIdx <= 0}
-                          onClick={prevQuestion}
-                        >
-                          ← 上一题
-                        </button>
-                        {!reviewItem && (
-                          <button className="link" onClick={() => startPractice(practiceKind)}>
-                            换一题
-                          </button>
-                        )}
-                        <button
-                          className="link"
-                          onClick={() => {
-                            setHistory([]);
-                            setHistIdx(-1);
-                          }}
-                        >
-                          选择题型
-                        </button>
-                      </span>
-                    </div>
+                    <QuizHeader
+                      tag={KIND_LABELS[quiz.kind]}
+                      review={
+                        reviewItem
+                          ? {
+                              tag: reviewItem.tag,
+                              remaining: Math.max(0, history.length - histIdx - 1),
+                            }
+                          : null
+                      }
+                      canPrev={histIdx > 0}
+                      onPrev={prevQuestion}
+                      onChange={
+                        reviewItem ? undefined : () => startPractice(practiceKind)
+                      }
+                      onClear={() => {
+                        setHistory([]);
+                        setHistIdx(-1);
+                      }}
+                    />
                     <h3 className="quiz-prompt">{quiz.prompt}</h3>
 
                     {quiz.kind === "clickCoord" ? (
@@ -965,16 +907,17 @@ export default function App() {
                         </div>
 
                         {clickFeedback && (
-                          <div className={clickFeedback.ok ? "feedback ok" : "feedback bad"}>
-                            <strong>
-                              {clickFeedback.ok
+                          <Feedback
+                            ok={clickFeedback.ok}
+                            title={
+                              clickFeedback.ok
                                 ? "定位正确"
                                 : clickFeedback.reveal
                                   ? "看一下正确位置"
-                                  : "偏了一点"}
-                            </strong>
-                            <p>{clickFeedback.msg}</p>
-                          </div>
+                                  : "偏了一点"
+                            }
+                            message={clickFeedback.msg}
+                          />
                         )}
 
                         {!clickFeedback?.reveal ? (
@@ -1008,16 +951,17 @@ export default function App() {
                         </div>
 
                         {clickFeedback && (
-                          <div className={clickFeedback.ok ? "feedback ok" : "feedback bad"}>
-                            <strong>
-                              {clickFeedback.ok
+                          <Feedback
+                            ok={clickFeedback.ok}
+                            title={
+                              clickFeedback.ok
                                 ? "找对了"
                                 : clickFeedback.reveal
                                   ? "看一下正确位置"
-                                  : "不是这个省"}
-                            </strong>
-                            <p>{clickFeedback.msg}</p>
-                          </div>
+                                  : "不是这个省"
+                            }
+                            message={clickFeedback.msg}
+                          />
                         )}
 
                         {clickFeedback?.reveal ? (
@@ -1042,48 +986,18 @@ export default function App() {
                         )}
                       </div>
                     ) : (
-                      <>
-                        <div className="options">
-                          {quiz.options.map((opt, i) => {
-                            let cls = "option";
-                            if (chosen !== null) {
-                              if (i === quiz.answer) cls += " correct";
-                              else if (i === chosen) cls += " wrong";
-                              else cls += " dim";
-                            }
-                            return (
-                              <button
-                                key={opt}
-                                className={cls}
-                                onClick={() => answer(i)}
-                                disabled={chosen !== null}
-                              >
-                                <span className="opt-key">{OPTION_KEYS[i]}</span>
-                                <span>{opt}</span>
-                              </button>
-                            );
-                          })}
-                        </div>
-
-                        {chosen !== null && (
-                          <div className={chosen === quiz.answer ? "feedback ok" : "feedback bad"}>
-                            <strong>{chosen === quiz.answer ? "答对了" : "再想想"}</strong>
-                            <p>{quiz.explain}</p>
-                          </div>
-                        )}
-
-                        {chosen !== null && chosen === quiz.answer && !entry?.added && (
-                          <button className="link manual-add" onClick={manualAdd}>
-                            这道我蒙对的，加入错题本
-                          </button>
-                        )}
-
-                        {chosen !== null && (
-                          <button className="btn big" onClick={nextQuestion}>
-                            {reviewItem ? "下一道错题" : "下一题"}
-                          </button>
-                        )}
-                      </>
+                      <ChoiceQuestion
+                        options={quiz.options}
+                        answer={quiz.answer}
+                        chosen={chosen}
+                        explain={quiz.explain}
+                        added={!!entry?.added}
+                        review={!!reviewItem}
+                        onChoose={answer}
+                        onManualAdd={manualAdd}
+                        onNext={nextQuestion}
+                        optionKeys={OPTION_KEYS}
+                      />
                     )}
                   </div>
                 )}
@@ -1091,87 +1005,17 @@ export default function App() {
             )}
 
             {tab === "wrong" && (
-              <div className="wrong">
-                <div className="stat-row">
-                  <div className="stat">
-                    <b>{stats.total}</b>
-                    <span>错题总数</span>
-                  </div>
-                  <div className="stat">
-                    <b>{stats.due}</b>
-                    <span>今天要复习</span>
-                  </div>
-                  <div className="stat">
-                    <b>{stats.mastered}</b>
-                    <span>已掌握</span>
-                  </div>
-                </div>
-
-                <button
-                  className="btn big"
-                  disabled={stats.due === 0}
-                  onClick={() => startReview(dueItems(wrongbook))}
-                >
-                  {stats.due === 0 ? "今天没有要复习的错题" : `开始复习（${stats.due} 道）`}
-                </button>
-
-                {stats.byTag.length > 0 && (
-                  <div className="tag-stats">
-                    <h4>按知识点</h4>
-                    {stats.byTag.map((t) => (
-                      <div key={t.tag} className="tag-stat">
-                        <span>{t.tag}</span>
-                        <div className="bar">
-                          <i style={{ width: `${Math.round((t.mastered / t.count) * 100)}%` }} />
-                        </div>
-                        <em>{t.mastered}/{t.count}</em>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                <div className="wrong-list">
-                  {wrongbook.length === 0 && (
-                    <div className="empty">
-                      还没有错题。做几道练习，错的题会自动进来，并按 1 / 3 / 7 / 15 天的间隔提醒你复习。
-                    </div>
-                  )}
-                  {wrongbook.map((it) => (
-                    <div key={it.id} className="wrong-item">
-                      <div className="wrong-top">
-                        <span className="wrong-tag">{it.tag}</span>
-                        <span className={it.stage >= 4 ? "stage-badge done" : "stage-badge"}>
-                          {it.stage >= 4 ? "已掌握" : `第 ${it.stage + 1} 阶`}
-                        </span>
-                      </div>
-                      <p className="wrong-prompt">{it.prompt}</p>
-                      <p className="wrong-answer">
-                        你的答案：<s>{it.userAnswer}</s> ｜ 正确答案：<b>{it.correct}</b>
-                      </p>
-                      <button className="link" onClick={() => startReview([it])}>
-                        重练这一道
-                      </button>
-                    </div>
-                  ))}
-                </div>
-
-                {wrongbook.length > 0 && (
-                  <button
-                    className="btn ghost danger"
-                    onClick={() => {
-                      if (confirm("清空所有错题记录？这个操作不能撤销。")) {
-                        setWrongbook(clearWrongBook());
-                      }
-                    }}
-                  >
-                    清空错题本
-                  </button>
-                )}
-              </div>
+              <WrongBookPanel
+                items={wrongbook}
+                stats={stats}
+                onReviewDue={() => startReview(dueItems(wrongbook))}
+                onRetry={(item) => startReview([item])}
+                onClear={() => setWrongbook(clearWrongBook())}
+              />
             )}
           </div>
-        </aside>
-      </main>
-    </div>
+        </>
+      }
+    />
   );
 }
